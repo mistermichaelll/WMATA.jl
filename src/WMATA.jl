@@ -1,5 +1,6 @@
 module WMATA
 
+
 import DataFrames.DataFrame, JSON.parse, HTTP.request
 
 function station_list(sub_key::String, LineCode::String)
@@ -21,23 +22,23 @@ function station_list(sub_key::String, LineCode::String)
     address = []
     lat = []
     long = []
-    for i in test_me["Stations"] 
+    for i in r["Stations"] 
         push!(name, i["Name"])
     end
 
-    for i in test_me["Stations"] 
+    for i in r["Stations"] 
         push!(station_code, i["Code"])
     end
 
-    for i in test_me["Stations"] 
+    for i in r["Stations"] 
         push!(address, i["Address"])
     end
 
-    for i in test_me["Stations"] 
+    for i in r["Stations"] 
         push!(lat, i["Lat"])
     end
 
-    for i in test_me["Stations"] 
+    for i in r["Stations"] 
         push!(long, i["Lon"])
     end
 
