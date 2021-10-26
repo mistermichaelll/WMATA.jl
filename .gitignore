@@ -25,3 +25,4 @@ Manifest.toml
 .Rproj.user
 *.Rproj
 *.DS_Store
+*.Rhistory
