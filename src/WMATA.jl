@@ -1,14 +1,27 @@
 module WMATA
 
-
 import DataFrames.DataFrame, JSON.parse, HTTP.request
 
-function station_list(sub_key::String, LineCode::String)
-    #= 
-    Returns a dataframe of station location and address information based on a given LineCode. Omit the LineCode to return all stations. 
-    =#
-    url = "https://api.wmata.com/Rail.svc/json/jStations" * LineCode # LineCode can be empty
-    subscription_key = Dict("api_key" => sub_key)
+#= 
+Function Name: station_list 
+Purpose: Returns a dataframe of station location and address information based on a given LineCode. 
+Arguments:
+    1) SubscriptionKey - subscription key from WMATA's API. I recommend defining this as a constant at the start of your script.
+    2) LineCode - can be empty or one of the following two-letter abbreviations: 
+        RD - Red
+        YL - Yellow
+        GR - Green
+        BL - Blue
+        OR - Orange
+        SV - Silver
+=#
+function station_list(SubscriptionKey::String, LineCode::String = "")
+    if LineCode == "" 
+        url = "https://api.wmata.com/Rail.svc/json/jStations"
+    else 
+        url = "https://api.wmata.com/Rail.svc/json/jStations" * "?LineCode=" * LineCode
+    end
+    subscription_key = Dict("api_key" => SubscriptionKey)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
     #= 
@@ -54,23 +67,24 @@ function station_list(sub_key::String, LineCode::String)
 
 end
 
-function rail_predictions(sub_key::String, station_id::String)
-    #=
-    This function returns a dataframe with next train arrival information for one or more stations. Will return an empty set of results when no predictions are available. 
-    Use All for the StationCodes parameter to return predictions for all stations.
+#=
+This function returns a dataframe with next train arrival information for one or more stations. Will return an empty set of results when no predictions are available. 
+Use All for the StationCodes parameter to return predictions for all stations (this is default).
 
-    For terminal stations (e.g.: Greenbelt, Shady Grove, etc.), predictions may be displayed twice.
+For terminal stations (e.g.: Greenbelt, Shady Grove, etc.), predictions may be displayed twice.
 
-    Some stations have two platforms (e.g.: Gallery Place, Fort Totten, L'Enfant Plaza, and Metro Center). To retrieve complete predictions for these stations, be sure to pass in both StationCodes.
+Some stations have two platforms (e.g.: Gallery Place, Fort Totten, L'Enfant Plaza, and Metro Center). To retrieve complete predictions for these stations, be sure to pass in both StationCodes.
 
-    For trains with no passengers, the DestinationName will be No Passenger.
+For trains with no passengers, the DestinationName will be No Passenger.
 
-    Next train arrival information is refreshed once every 20 to 30 seconds approximately.
-    =#
+Next train arrival information is refreshed once every 20 to 30 seconds approximately.
+=#
+function rail_predictions(SubscriptionKey::String, station_id::String = "All")
     url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * station_id * "/"
-    subscription_key = Dict("api_key" => sub_key)
+    subscription_key = Dict("api_key" => SubscriptionKey)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
+
     # define empty lists for parsing json
     # -----------------------------------
     lines = []
