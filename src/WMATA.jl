@@ -120,7 +120,7 @@ function rail_predictions(SubscriptionKey::String, station_id::String = "All")
     # create dataframe and 
     # return it from function
     # -----------------------
-    rail_predictions = DataFrame("Arrival Station" => location, "Location Code" => location_code, "Lines" => lines, "Cars" => cars, "Destination" => destination, "Group" => group, "Minutes" => mins)
+    rail_predictions = DataFrame("Arrival Station" => location, "Location Code" => location_code, "Line" => lines, "Cars" => cars, "Destination" => destination, "Group" => group, "Minutes" => mins)
 
     rail_predictions
 end
