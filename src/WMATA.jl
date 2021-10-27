@@ -125,5 +125,4 @@ function rail_predictions(SubscriptionKey::String, station_id::String = "All")
     rail_predictions
 end
 
-
 end # module
