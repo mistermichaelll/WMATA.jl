@@ -1,6 +1,6 @@
 name = "WMATA"
 uuid = "c2cd05a6-7bf5-4377-a8fd-401026dff5dd"
-authors = ["mistermichaelll <mkjohnson@mail.roanoke.edu>"]
+authors = ["Michael Johnson <mkjohnson@protonmail.com?"]
 version = "0.1.0"
 
 [deps]
