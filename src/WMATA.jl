@@ -2,6 +2,8 @@ module WMATA
 
 import DataFrames.DataFrame, JSON.parse, HTTP.request
 
+export rail_predictions, station_list
+
 #= 
 Function Name: station_list 
 Purpose: Returns a dataframe of station location and address information based on a given LineCode. 
