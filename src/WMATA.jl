@@ -17,7 +17,8 @@ Arguments:
         OR - Orange
         SV - Silver
 =#
-function station_list(SubscriptionKey::String, LineCode::String = "")
+function station_list(SubscriptionKey::String, LineCode::String = ""; IncludeAdditionalInfo::Bool = false)
+    # need additiona info if LineCode is included vs. if it is not.
     if LineCode == "" 
         url = "https://api.wmata.com/Rail.svc/json/jStations"
     else 
@@ -26,47 +27,102 @@ function station_list(SubscriptionKey::String, LineCode::String = "")
     subscription_key = Dict("api_key" => SubscriptionKey)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
-    #= 
-    TODO: STATION elements
-    ---------------------- 
-    address, code, lat, long, linecode1, linecode2, linecode3, linecode4, name, 
-    stationtogether1, stationtogether2
-    =#
+
+    # get the basic station elements
     name = []
     station_code = []
-    address = []
     lat = []
     long = []
-    for i in r["Stations"] 
-        push!(name, i["Name"])
+
+    # additional station elements dataframe will optionally include
+    station_together_1 = []
+    station_together_2 = []
+    line_code_2 = []
+    line_code_3 = []
+    line_code_4 = []
+
+    for station in r["Stations"] 
+        push!(name, station["Name"])
     end
 
-    for i in r["Stations"] 
-        push!(station_code, i["Code"])
+    for station in r["Stations"] 
+        push!(station_code, station["Code"])
     end
 
-    for i in r["Stations"] 
-        push!(address, i["Address"])
+    # this will return the station addresses in a dictionary. 
+    # I've chosen to split them into coulumns.
+    # -------------------------------------------------------
+    # for station in r["Stations"] 
+    #     push!(address, station["Address"])
+    # end
+
+    for station in r["Stations"] 
+        push!(lat, station["Lat"])
     end
 
-    for i in r["Stations"] 
-        push!(lat, i["Lat"])
+    for station in r["Stations"] 
+        push!(long, station["Lon"])
     end
 
-    for i in r["Stations"] 
-        push!(long, i["Lon"])
+    # stations together
+    for station in r["Stations"] 
+        push!(station_together_1, station["StationTogether1"])
+    end
+    # currently not in use, according to API doc.
+    # for station in r["Stations"] 
+    #     push!(station_together_2, station["StationTogether2"])
+    # end
+
+    # additional line codes
+    for station in r["Stations"] 
+        push!(line_code_2, station["LineCode2"])
+    end
+    for station in r["Stations"] 
+        push!(line_code_3, station["LineCode3"])
+    end
+    for station in r["Stations"] 
+        push!(line_code_4, station["LineCode4"])
     end
 
 
-    #= 
-    TODO: Address Elements 
-    ----------------------
-    city, state, street, zip
-    =#
-    station_info = DataFrame("StationName" => name, "StationCode" => station_code, "Address" => address, "Latitude" => lat, "Longitude" => long)
+    # get the address elements of the stations
+    # ----------------------------------------
+    city = []
+    state = []
+    street = []
+    zip = []
+
+    for station in r["Stations"]
+        push!(city, station["Address"][:"City"])
+    end
+
+    for station in r["Stations"]
+        push!(state, station["Address"][:"State"])
+    end
+
+    for station in r["Stations"]
+        push!(street, station["Address"][:"Street"])
+    end
+
+    for station in r["Stations"]
+        push!(zip, station["Address"][:"Zip"])
+    end
+
+    if IncludeAdditionalInfo == true
+        station_info = DataFrame("StationName" => name, "StationCode" => station_code, 
+        # -------------------------------------------------------------------------------------------
+        # additional information returned if requested
+        "StationTogether1" => station_together_1, 
+        # "StationTogether2" => station_together_2, 
+        "LineCode2" => line_code_2, "LineCode3" => line_code_3, "LineCode4" => line_code_4,
+        # -------------------------------------------------------------------------------------------
+        "Latitude" => lat, "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip)
+    else 
+        station_info = DataFrame("StationName" => name, "StationCode" => station_code, "Latitude" => lat, 
+        "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip)
+    end
 
     station_info
-
 end
 
 #=
