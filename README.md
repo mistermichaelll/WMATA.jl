@@ -58,7 +58,7 @@ station_list(sub_key, "YL", IncludeAdditionalInfo = false)
 
 This will return the same DataFrame as above, with the following additions:
 
-**LineCode2:***	Additional line served by this station, if applicable.
-**LineCode3:*** Additional line served by this station, if applicable.
-**LineCode4:*** Additional line served by this station, if applicable. Currently not in use.
-**StationTogether1:** For stations with multiple platforms (e.g.: Gallery Place, Fort Totten, L'Enfant Plaza, and Metro Center), the additional StationCode will be listed here.
+* **LineCode2:***	Additional line served by this station, if applicable.
+* **LineCode3:*** Additional line served by this station, if applicable.
+* **LineCode4:*** Additional line served by this station, if applicable. Currently not in use.
+* **StationTogether1:** For stations with multiple platforms (e.g.: Gallery Place, Fort Totten, L'Enfant Plaza, and Metro Center), the additional StationCode will be listed here.
