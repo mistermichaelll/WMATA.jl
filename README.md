@@ -37,7 +37,7 @@ Returns a DataFrame of station location and address information based on a given
 ```
 using WMATA
 sub_key = "your API key"
-station_list(sub_key, "YL", false)
+station_list(sub_key, "YL")
 ```
 
 The resulting DataFrame includes:
@@ -53,7 +53,7 @@ The resulting DataFrame includes:
 An additional argument, `IncludeAdditionalInfo`, can be specified via `true/false`. 
 
 ```
-station_list(sub_key, "YL", IncludeAdditionalInfo = false)
+station_list(sub_key, "YL", IncludeAdditionalInfo = true)
 ```
 
 This will return the same DataFrame as above, with the following additions:
