@@ -4,7 +4,7 @@ Julia package which simplifies the process of interacting with WMATA's public AP
 # Getting Started 
 You will need an API key from [WMATA's developer portal](https://developer.wmata.com/).
 
-You can get up and running with your subscription key using the `WMATA_auth()` function. This function verifies that you have a valid subscription key and sets a global variable called AuthKey after verifying your key.
+You can get up and running with your subscription key using the `WMATA_auth()` function. This function verifies that you have a valid subscription key and sets a global variable called `AuthKey` after verifying your key.
 
 ```
 using WMATA
