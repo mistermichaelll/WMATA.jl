@@ -41,7 +41,7 @@ Returns a DataFrame of station location and address information based on a given
 * SV - Silver
 
 ```
-station_list(LineCode = "YL", false)
+station_list(LineCode = "YL")
 ```
 
 The resulting DataFrame includes:
