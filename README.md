@@ -30,9 +30,9 @@ This function returns a DataFrame containing:
 * **Minutes:** minutes until arrival. Can be a numeric value, ARR (arriving), BRD (boarding), ---, or empty.
 
 ## station_list()
-Returns a DataFrame of station location and address information based on a given LineCode. Omit the *LineCode* to return all stations. 
+Returns a DataFrame of station location and address information based on a given LineCode. Use `LineCode = "All"` to return all stations. 
 
-*LineCode* - can be empty or one of the following two-letter abbreviations: 
+*LineCode* - can be "All" or one of the following two-letter abbreviations: 
 * RD - Red
 * YL - Yellow
 * GR - Green
@@ -41,7 +41,7 @@ Returns a DataFrame of station location and address information based on a given
 * SV - Silver
 
 ```
-station_list(LineCode = "YL")
+station_list(LineCode = "All")
 ```
 
 The resulting DataFrame includes:

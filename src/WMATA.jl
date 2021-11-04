@@ -18,7 +18,7 @@ Arguments:
 =#
 function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = false)
     # need additional info if LineCode is included vs. if it is not.
-    if LineCode == "" 
+    if LineCode == "All" 
         url = "https://api.wmata.com/Rail.svc/json/jStations"
     else 
         url = "https://api.wmata.com/Rail.svc/json/jStations" * "?LineCode=" * LineCode
