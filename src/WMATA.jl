@@ -1,15 +1,14 @@
 module WMATA
+include("authentication.jl")
 
 import DataFrames.DataFrame, JSON.parse, HTTP.request
-
-export rail_predictions, station_list, station_timings
+export rail_predictions, station_list, station_timings, WMATA_auth
 
 #= 
 Function Name: station_list 
 Purpose: Returns a dataframe of station location and address information based on a given LineCode. 
 Arguments:
-    1) SubscriptionKey - subscription key from WMATA's API. I recommend defining this as a constant at the start of your script.
-    2) LineCode - can be empty or one of the following two-letter abbreviations: 
+    1) LineCode - can be empty or one of the following two-letter abbreviations: 
         RD - Red
         YL - Yellow
         GR - Green
@@ -17,7 +16,7 @@ Arguments:
         OR - Orange
         SV - Silver
 =#
-function station_list(SubscriptionKey::String, LineCode::String = ""; IncludeAdditionalInfo::Bool = false)
+function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = false)
     # need additional info if LineCode is included vs. if it is not.
     if LineCode == "" 
         url = "https://api.wmata.com/Rail.svc/json/jStations"
@@ -25,7 +24,7 @@ function station_list(SubscriptionKey::String, LineCode::String = ""; IncludeAdd
         url = "https://api.wmata.com/Rail.svc/json/jStations" * "?LineCode=" * LineCode
     end
 
-    subscription_key = Dict("api_key" => SubscriptionKey)
+    subscription_key = Dict("api_key" => AuthToken)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 
@@ -132,14 +131,14 @@ Returns opening and scheduled first/last train times based on a given StationCod
 
 Note that for stations with multiple platforms (e.g.: Metro Center, L'Enfant Plaza, etc.), a distinct call is required for each StationCode to retrieve the full set of train times at such stations. 
 =#
-function station_timings(SubscriptionKey::String; StationCode::String)
+function station_timings(;StationCode::String)
     if StationCode == "" 
         ArgumentError("Please select a single station code.")
     else 
         url = "https://api.wmata.com/Rail.svc/json/jStationTimes" * "?StationCode=" * StationCode
     end
     
-    subscription_key = Dict("api_key" => SubscriptionKey)
+    subscription_key = Dict("api_key" => AuthToken)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 
@@ -219,9 +218,9 @@ For trains with no passengers, the DestinationName will be No Passenger.
 
 Next train arrival information is refreshed once every 20 to 30 seconds approximately.
 =#
-function rail_predictions(SubscriptionKey::String, station_id::String = "All")
-    url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * station_id * "/"
-    subscription_key = Dict("api_key" => SubscriptionKey)
+function rail_predictions(;StationCode::String = "All")
+    url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * StationCode * "/"
+    subscription_key = Dict("api_key" => AuthToken)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 

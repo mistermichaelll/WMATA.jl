@@ -1,7 +1,15 @@
 # WMATA.jl
 Julia package which simplifies the process of interacting with WMATA's public API.
 
+# Getting Started 
 You will need an API key from [WMATA's developer portal](https://developer.wmata.com/).
+
+You can get up and running with your subscription key using the `WMATA_auth()` function. This function verifies that you have a valid subscription key and sets a global variable called AuthKey after verifying your key.
+
+```
+using WMATA
+WMATA_auth("your subscription key")
+```
 
 # Available Functions
 ## rail_predictions()
@@ -9,8 +17,7 @@ Based on the *Real Time Rail Predictions* methods described in WMATA's documenta
 
 ```
 using WMATA
-sub_key = "your API key"
-rail_predictions(sub_key, "All")
+rail_predictions("All")
 ```
 
 This function returns a DataFrame containing:
@@ -35,9 +42,7 @@ Returns a DataFrame of station location and address information based on a given
 * SV - Silver
 
 ```
-using WMATA
-sub_key = "your API key"
-station_list(sub_key, "YL", false)
+station_list(LineCode = "YL", false)
 ```
 
 The resulting DataFrame includes:
@@ -53,7 +58,7 @@ The resulting DataFrame includes:
 An additional argument, `IncludeAdditionalInfo`, can be specified via `true/false`. 
 
 ```
-station_list(sub_key, "YL", IncludeAdditionalInfo = false)
+station_list(LineCode = "YL", IncludeAdditionalInfo = false)
 ```
 
 This will return the same DataFrame as above, with the following additions:
@@ -70,9 +75,7 @@ Returns a DataFrame of opening and scheduled first/last train times based on a g
 Note that for stations with multiple platforms (e.g.: Metro Center, L'Enfant Plaza, etc.), a distinct call is required for each StationCode to retrieve the full set of train times at such stations. 
 
 ```
-using WMATA
-sub_key = "your API key"
-station_timings(sub_key, StationCode = "C14")
+station_timings(StationCode = "C14")
 ```
 The resulting DataFrame includes:
 
