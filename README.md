@@ -17,7 +17,7 @@ Based on the *Real Time Rail Predictions* methods described in WMATA's documenta
 
 ```
 using WMATA
-rail_predictions("All")
+rail_predictions(StationCode = "All")
 ```
 
 This function returns a DataFrame containing:
