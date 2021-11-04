@@ -16,7 +16,6 @@ WMATA_auth("your subscription key")
 Based on the *Real Time Rail Predictions* methods described in WMATA's documentation [here](https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f).
 
 ```
-using WMATA
 rail_predictions(StationCode = "All")
 ```
 
