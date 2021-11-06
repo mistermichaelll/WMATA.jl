@@ -167,7 +167,7 @@ function station_timings(;StationCode::String)
             push!(first_trains_destinations, r["StationTimes"][:1][i]["FirstTrains"][:1]["DestinationStation"])
         end
     catch 
-        @warn "No First/Last train information. Please check the incident report for this station."
+        @warn "No First/Last train information available."
         d_c = "DROP"
     end
 
