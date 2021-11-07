@@ -1,4 +1,3 @@
-import HTTP.request
 #= 
 Function Name: WMATA_auth()
 Purpose: WMATA's API has an endpoint which allows us to verify whether a subscription key is valid, or if there is 
