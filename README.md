@@ -4,7 +4,7 @@ Julia package which simplifies the process of interacting with WMATA's public AP
 # Getting Started 
 You will need an API key from [WMATA's developer portal](https://developer.wmata.com/).
 
-You can get up and running with your subscription key using the `WMATA_auth()` function. This function verifies that you have a valid subscription key and sets a global variable called `AuthKey` after verifying your key.
+You can get up and running with your subscription key using the `WMATA_auth()` function. This function verifies that you have a valid subscription key and sets a global variable called `WMATA_AuthToken` after verifying your key.
 
 ```
 using WMATA
@@ -86,3 +86,20 @@ The resulting DataFrame includes:
 * **FirstTrainTime:** first train leaves the station at this time. Format is HH:mm. 
 * **LastTrainDestination:** the StationCode of the last train's destination.
 * **LastTrainTime:** last train leaves the station at this time. Format is HH::mm. Note that when the time is AM, it signifies the next day. For example, a value of 02:30 under a Saturday element means the last train leaves on Sunday at 2:30 AM.
+
+## path_between()
+
+Returns a DataFrame of ordered stations and distances between two stations on the same line.
+
+*Note that this method is not suitable on its own as a pathfinding solution between stations.*
+
+```
+path_between(FromStationCode = "C13", ToStationCode = "C14")
+```
+The resulting DataFrame includes: 
+
+* **SequenceNumber:** Ordered sequence number.
+* **StationName:** Full name for this station, as shown on the WMATA website.
+* **StationCode:** Station code for this station. 
+* **LineCode:**	Two-letter abbreviation for the line (e.g.: RD, BL, YL, OR, GR, or SV) this station's platform is on.
+* **DistanceToPrev:** Distance in feet to the previous station in the list.
