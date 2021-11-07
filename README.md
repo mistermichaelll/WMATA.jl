@@ -18,8 +18,15 @@ Based on the *Real Time Rail Predictions* methods described in WMATA's documenta
 ```
 rail_predictions(StationCode = "All")
 ```
+Returns a DataFrame of next train arrival information for one or more stations. Will return an empty set of results when no predictions are available. Use All for the StationCodes parameter to return predictions for all stations.
 
-This function returns a DataFrame containing:
+For terminal stations (e.g.: Greenbelt, Shady Grove, etc.), predictions may be displayed twice.
+
+Some stations have two platforms (e.g.: Gallery Place, Fort Totten, L'Enfant Plaza, and Metro Center). To retrieve complete predictions for these stations, be sure to pass in both StationCodes.
+
+For trains with no passengers, the DestinationName will be No Passenger.
+
+Next train arrival information is refreshed once every 20 to 30 seconds approximately.
 
 * **Arrival Station:** full name of the station where the train is arriving. 
 * **Location Code:** station code for where the train is arriving.
