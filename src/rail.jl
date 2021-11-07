@@ -327,7 +327,7 @@ Function Name: station_to_station()
 Returns a distance, fare information, and estimated travel time between any two stations, including those on different lines. 
 Omit both parameters to retrieve data for all stations.
 =# 
-function station_to_station(FromStationCode::String = "", ToStationCode::String = "")
+function station_to_station(;FromStationCode::String = "", ToStationCode::String = "")
     if (FromStationCode == "" && ToStationCode == "")
         url = "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo"
     else
