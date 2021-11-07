@@ -103,3 +103,22 @@ The resulting DataFrame includes:
 * **StationCode:** Station code for this station. 
 * **LineCode:**	Two-letter abbreviation for the line (e.g.: RD, BL, YL, OR, GR, or SV) this station's platform is on.
 * **DistanceToPrev:** Distance in feet to the previous station in the list.
+
+## station_to_station()
+
+Returns a DataFrame with the distance, fare information, and estimated travel time between any two stations, including those on different lines. 
+
+Omit both `FromStationCode` and `ToStationCode` to retrieve data for all stations.
+
+```
+station_to_station(FromStationCode = "C13", ToStationCode = "C14")
+```
+The resulting DataFrame includes: 
+
+* **OriginStation:** origin station code.
+* **DestinationStation:** destination station code.
+* **CompositeMiles:** average of distance traveled between two stations and straight-line distance (as used for WMATA fare calculations). 
+* **RailTimes:** destination station code.
+* **SeniorRailFare:** reduced fare for senior citizens or people with disabilities.
+* **PeakRailFare:** fare during peak times (weekdays from opening to 9:30 AM and 3-7 PM, and weekends from midnight to closing).
+* **OffPeakRailFare:** fare during off-peak times (times other than the ones described below).

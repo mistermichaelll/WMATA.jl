@@ -10,7 +10,7 @@ those up this way.
 
 #= 
 Function Name: station_list 
-Purpose: Returns a dataframe of station location and address information based on a given LineCode. 
+Description: Returns a dataframe of station location and address information based on a given LineCode. 
 Arguments:
     1) LineCode - can be empty or one of the following two-letter abbreviations: 
         RD - Red
@@ -131,7 +131,7 @@ end
 
 #= 
 Function Name: station_timings
-Returns opening and scheduled first/last train times based on a given StationCode.
+Description: Returns opening and scheduled first/last train times based on a given StationCode.
 
 Note that for stations with multiple platforms (e.g.: Metro Center, L'Enfant Plaza, etc.), a distinct call is required for each StationCode to retrieve the full set of train times at such stations. 
 =#
@@ -211,7 +211,9 @@ function station_timings(;StationCode::String)
 end
 
 #=
-This function returns a dataframe with next train arrival information for one or more stations. Will return an empty set of results when no predictions are available. 
+Function Name: rail_predictions()
+Description: This function returns a dataframe with next train arrival information for one or more stations. 
+Will return an empty set of results when no predictions are available. 
 Use All for the StationCodes parameter to return predictions for all stations (this is default).
 
 For terminal stations (e.g.: Greenbelt, Shady Grove, etc.), predictions may be displayed twice.
@@ -269,6 +271,8 @@ function rail_predictions(;StationCode::String = "All")
 end
 
 #=
+Function Name: path_between()
+
 Returns a set of ordered stations and distances between two stations on the same line.
 
 Note that this method is not suitable on its own as a pathfinding solution between stations.
@@ -315,4 +319,62 @@ function path_between(;FromStationCode::String, ToStationCode::String)
         "LineCode" => line_codes, "DistanceToPrevious" => distances_to_prev)
         paths 
     end
+end
+
+#=
+Function Name: station_to_station()
+
+Returns a distance, fare information, and estimated travel time between any two stations, including those on different lines. 
+Omit both parameters to retrieve data for all stations.
+=# 
+function station_to_station(FromStationCode::String = "", ToStationCode::String = "")
+    if (FromStationCode == "" && ToStationCode == "")
+        url = "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo"
+    else
+        url = "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?" * "FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
+    end
+    subscription_key = Dict("api_key" => WMATA_AuthToken)
+    r = request("GET", url, subscription_key)
+    r = parse(String(r.body))
+    # ----------------------------------------
+    origin_stations = [] 
+    destination_stations = []
+    composite_miles = [] 
+    rail_times = [] 
+    senior_rail_fare = [] 
+    peak_rail_fare = [] 
+    off_peak_rail_fare = []
+    # ----------------------------------------
+    for i in 1:length(r["StationToStationInfos"])
+        push!(origin_stations, r["StationToStationInfos"][i]["SourceStation"])
+    end 
+    
+    for i in 1:length(r["StationToStationInfos"])
+        push!(destination_stations, r["StationToStationInfos"][i]["DestinationStation"])
+    end 
+    
+    for i in 1:length(r["StationToStationInfos"])
+        push!(composite_miles, r["StationToStationInfos"][i]["CompositeMiles"])
+    end
+    
+    for i in 1:length(r["StationToStationInfos"])
+        push!(rail_times, r["StationToStationInfos"][i]["RailTime"])
+    end
+    
+    for i in 1:length(r["StationToStationInfos"])
+        push!(senior_rail_fare, r["StationToStationInfos"][i]["RailFare"]["SeniorDisabled"])
+    end
+    
+    for i in 1:length(r["StationToStationInfos"])
+        push!(peak_rail_fare, r["StationToStationInfos"][i]["RailFare"]["PeakTime"])
+    end
+    
+    for i in 1:length(r["StationToStationInfos"])
+        push!(off_peak_rail_fare, r["StationToStationInfos"][i]["RailFare"]["OffPeakTime"])
+    end
+    # ----------------------------------------
+    station_to_station = DataFrame("OriginStation" => origin_stations, "DestinationStation" => destination_stations, "CompositeMiles" => composite_miles, 
+    "RailTimes" => rail_times, "SeniorRailFare" => senior_rail_fare, "PeakRailFare" => peak_rail_fare, "OffPeakRailFare" => off_peak_rail_fare)
+    
+    station_to_station
 end
