@@ -45,72 +45,38 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
     line_code_3 = []
     line_code_4 = []
 
-    for station in r["Stations"] 
-        push!(name, station["Name"])
-    end
-
-    for station in r["Stations"] 
-        push!(station_code, station["Code"])
-    end
-
-    # this will return the station addresses in a dictionary. 
-    # I've chosen to split them into coulumns.
-    # -------------------------------------------------------
-    # for station in r["Stations"] 
-    #     push!(address, station["Address"])
-    # end
-
-    for station in r["Stations"] 
-        push!(lat, station["Lat"])
-    end
-
-    for station in r["Stations"] 
-        push!(long, station["Lon"])
-    end
-
-    # stations together
-    for station in r["Stations"] 
-        push!(station_together_1, station["StationTogether1"])
-    end
-    # currently not in use, according to API doc.
-    # for station in r["Stations"] 
-    #     push!(station_together_2, station["StationTogether2"])
-    # end
-
-    # additional line codes
-    for station in r["Stations"] 
-        push!(line_code_2, station["LineCode2"])
-    end
-    for station in r["Stations"] 
-        push!(line_code_3, station["LineCode3"])
-    end
-    for station in r["Stations"] 
-        push!(line_code_4, station["LineCode4"])
-    end
-
-
-    # get the address elements of the stations
-    # ----------------------------------------
-    city = []
+    # address elements 
+    city = [] 
     state = []
-    street = []
+    street = [] 
     zip = []
 
-    for station in r["Stations"]
+    for station in r["Stations"] 
+        push!(name, station["Name"])
+        push!(station_code, station["Code"])
+        # additional line codes
+        push!(line_code_2, station["LineCode2"])
+        push!(line_code_3, station["LineCode3"])
+        push!(line_code_4, station["LineCode4"])
+        # station together 1 
+        push!(station_together_1, station["StationTogether1"])
+        # lat/long 
+        push!(lat, station["Lat"])
+        push!(long, station["Lon"])
+        # address elements of the station 
         push!(city, station["Address"][:"City"])
-    end
-
-    for station in r["Stations"]
         push!(state, station["Address"][:"State"])
-    end
-
-    for station in r["Stations"]
         push!(street, station["Address"][:"Street"])
-    end
-
-    for station in r["Stations"]
         push!(zip, station["Address"][:"Zip"])
     end
+
+    #= currently not in use, according to API doc.
+
+     for station in r["Stations"] 
+         push!(station_together_2, station["StationTogether2"])
+     end
+
+    =# 
 
     if IncludeAdditionalInfo == true
         station_info = DataFrame("StationName" => name, "StationCode" => station_code, 
@@ -177,35 +143,28 @@ function station_timings(;StationCode::String)
 
     if d_c != "DROP"
         first_trains_destinations = []
+        first_trains_times = []
+        last_trains_destinations = []
+        last_trains_times = []
+
         for i in days_of_week
             push!(first_trains_destinations, r["StationTimes"][:1][i]["FirstTrains"][:1]["DestinationStation"])
-        end
-
-        first_trains_times = []
-        for i in days_of_week 
             push!(first_trains_times, r["StationTimes"][:1][i]["FirstTrains"][:1]["Time"])
-        end
-
-        last_trains_times = []
-        for i in days_of_week 
+            push!(last_trains_destinations, r["StationTimes"][:1][i]["LastTrains"][:1]["DestinationStation"])
             push!(last_trains_times, r["StationTimes"][:1][i]["LastTrains"][:1]["Time"])
         end
 
-        last_trains_times = []
-        for i in days_of_week 
-            push!(last_trains_times, r["StationTimes"][:1][i]["LastTrains"][:1]["Time"])
-        end
     else 
         # fill out the columns that are missing but in a familiar fashion.
         first_trains_destinations = ["--", "--", "--", "--", "--", "--", "--"]
         first_trains_times = ["--", "--", "--", "--", "--", "--", "--"]
         last_trains_times = ["--", "--", "--", "--", "--", "--", "--"]
-        last_trains_times = ["--", "--", "--", "--", "--", "--", "--"] 
+        last_trains_destinations = ["--", "--", "--", "--", "--", "--", "--"] 
     end
 
     station_timings = DataFrame("StationName" => station_name, "StationCode" => station_code, "DayOfWeek" => days_of_week, 
     "OpeningTime" => opening_times, "FirstTrainDestination" => first_trains_destinations, "FirstTrainTime" => first_trains_times, 
-    "LastTrainDestination" => first_trains_destinations, "LastTrainTime" => first_trains_times)
+    "LastTrainDestination" => last_trains_destinations, "LastTrainTime" => last_trains_times)
 
     station_timings
 end
@@ -239,29 +198,19 @@ function rail_predictions(;StationCode::String = "All")
     location = []
     location_code = []
     cars = []
+
     # create the lists that make up our dataframe 
     # -------------------------------------------
     for i in r["Trains"]
         push!(lines, i["Line"])
-    end
-    for i in r["Trains"]
         push!(destination, String(i["Destination"]))
-    end
-    for i in r["Trains"]
         push!(group, i["Group"])
-    end
-    for i in r["Trains"]
         push!(location, String(i["LocationName"]))
-    end
-    for i in r["Trains"]
         push!(location_code, String(i["LocationCode"]))
-    end
-    for i in r["Trains"]
         push!(mins ,i["Min"])
-    end
-    for i in r["Trains"]
         push!(cars ,i["Car"])
     end
+
     # create dataframe and 
     # return it from function
     # -----------------------
@@ -282,6 +231,7 @@ function path_between(;FromStationCode::String, ToStationCode::String)
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
+
     # define vectors for us to push info to
     # -------------------------------------
     seq_nums = [] 
@@ -289,28 +239,18 @@ function path_between(;FromStationCode::String, ToStationCode::String)
     station_codes = []
     line_codes = []
     distances_to_prev = []
+
     # get the vectors of information, these 
     # will be in order of sequence.
     # -------------------------------------
     for path_point in 1:length(r["Path"])
         push!(seq_nums, r["Path"][path_point]["SeqNum"])
-    end
-    
-    for path_point in 1:length(r["Path"])
         push!(station_names, r["Path"][path_point]["StationName"])
-    end
-    
-    for path_point in 1:length(r["Path"])
         push!(station_codes, r["Path"][path_point]["StationCode"])
-    end
-    
-    for path_point in 1:length(r["Path"])
         push!(line_codes, r["Path"][path_point]["LineCode"])
-    end
-    
-    for path_point in 1:length(r["Path"])
         push!(distances_to_prev, r["Path"][path_point]["DistanceToPrev"])
     end
+
     # check if user has input stations which are on the same line.
     if length(seq_nums) == 0 & length(station_names) == 0
         @error "No path between stations. Did you choose stations on the same line?"
@@ -347,31 +287,13 @@ function station_to_station(;FromStationCode::String = "", ToStationCode::String
     # ----------------------------------------
     for i in 1:length(r["StationToStationInfos"])
         push!(origin_stations, r["StationToStationInfos"][i]["SourceStation"])
-    end 
-    
-    for i in 1:length(r["StationToStationInfos"])
         push!(destination_stations, r["StationToStationInfos"][i]["DestinationStation"])
-    end 
-    
-    for i in 1:length(r["StationToStationInfos"])
         push!(composite_miles, r["StationToStationInfos"][i]["CompositeMiles"])
-    end
-    
-    for i in 1:length(r["StationToStationInfos"])
         push!(rail_times, r["StationToStationInfos"][i]["RailTime"])
-    end
-    
-    for i in 1:length(r["StationToStationInfos"])
         push!(senior_rail_fare, r["StationToStationInfos"][i]["RailFare"]["SeniorDisabled"])
-    end
-    
-    for i in 1:length(r["StationToStationInfos"])
         push!(peak_rail_fare, r["StationToStationInfos"][i]["RailFare"]["PeakTime"])
-    end
-    
-    for i in 1:length(r["StationToStationInfos"])
         push!(off_peak_rail_fare, r["StationToStationInfos"][i]["RailFare"]["OffPeakTime"])
-    end
+    end 
     # ----------------------------------------
     station_to_station = DataFrame("OriginStation" => origin_stations, "DestinationStation" => destination_stations, "CompositeMiles" => composite_miles, 
     "RailTimes" => rail_times, "SeniorRailFare" => senior_rail_fare, "PeakRailFare" => peak_rail_fare, "OffPeakRailFare" => off_peak_rail_fare)
