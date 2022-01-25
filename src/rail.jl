@@ -21,7 +21,6 @@ Arguments:
         SV - Silver
 =#
 function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = false)
-    # need additional info if LineCode is included vs. if it is not.
     if LineCode == "All" 
         url = "https://api.wmata.com/Rail.svc/json/jStations"
     else 
@@ -32,40 +31,23 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 
-    # get the basic station elements
     name = [station["Name"] for station = r["Stations"]]
     station_code = [station["Code"] for station = r["Stations"]]
-    # additional line codes
     line_code_2 = [station["LineCode2"] for station = r["Stations"]]
     line_code_3 = [station["LineCode3"] for station = r["Stations"]]
     line_code_4 = [station["LineCode4"] for station = r["Stations"]]
-    # station together 1
     station_together_1 = [station["StationTogether1"] for station = r["Stations"]]
-    # lat/long
     lat = [station["Lat"] for station = r["Stations"]]
     long = [station["Lon"] for station = r["Stations"]]
-    # address elements of the station 
     city = [station["Address"][:"City"] for station = r["Stations"]]
     state = [station["Address"][:"State"] for station = r["Stations"]]
     street = [station["Address"][:"Street"] for station = r["Stations"]]
     zip = [station["Address"][:"Zip"] for station = r["Stations"]]
 
-    #= currently not in use, according to API doc.
-
-     for station in r["Stations"] 
-         push!(station_together_2, station["StationTogether2"])
-     end
-
-    =# 
-
     if IncludeAdditionalInfo == true
         station_info = DataFrame("StationName" => name, "StationCode" => station_code, 
-        # -------------------------------------------------------------------------------------------
-        # additional information returned if requested
         "StationTogether1" => station_together_1, 
-        # "StationTogether2" => station_together_2, 
         "LineCode2" => line_code_2, "LineCode3" => line_code_3, "LineCode4" => line_code_4,
-        # -------------------------------------------------------------------------------------------
         "Latitude" => lat, "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip)
     else 
         station_info = DataFrame("StationName" => name, "StationCode" => station_code, "Latitude" => lat, 
@@ -92,18 +74,12 @@ function station_timings(;StationCode::String)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 
-    # define the days of the week
     days_of_week = ["Sunday" ,"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-    # station name/code are constant values which we can pull from the API response
     station_name = r["StationTimes"][1]["StationName"]
     station_code = r["StationTimes"][1]["Code"]
 
-    opening_times = []
-    for i in days_of_week 
-        push!(opening_times, r["StationTimes"][1][i]["OpeningTime"])
-    end
-
+    opening_times = [r["StationTimes"][1][day]["OpeningTime"] for day = days_of_week]
     #= 
     from messing about in the API, there are cases where first/last train info is coming back empty and 
     resulting in an out of bounds error in Julia. I'm setting a drop condition (d_c) so that if these 
@@ -112,34 +88,22 @@ function station_timings(;StationCode::String)
     =#
     d_c = "OK"
     try 
-        first_trains_destinations = []
-        for i in days_of_week
-            push!(first_trains_destinations, r["StationTimes"][:1][i]["FirstTrains"][:1]["DestinationStation"])
-        end
+        first_trains_destinations = [r["StationTimes"][:1][day]["FirstTrains"][:1]["DestinationStation"] for day in days_of_week]
     catch 
         @warn "No First/Last train information available."
         d_c = "DROP"
     end
 
     if d_c != "DROP"
-        first_trains_destinations = []
-        first_trains_times = []
-        last_trains_destinations = []
-        last_trains_times = []
-
-        for i in days_of_week
-            push!(first_trains_destinations, r["StationTimes"][:1][i]["FirstTrains"][:1]["DestinationStation"])
-            push!(first_trains_times, r["StationTimes"][:1][i]["FirstTrains"][:1]["Time"])
-            push!(last_trains_destinations, r["StationTimes"][:1][i]["LastTrains"][:1]["DestinationStation"])
-            push!(last_trains_times, r["StationTimes"][:1][i]["LastTrains"][:1]["Time"])
-        end
-
+        first_trains_destinations = [r["StationTimes"][:1][day]["FirstTrains"][:1]["DestinationStation"] for day in days_of_week]
+        first_trains_times = [r["StationTimes"][:1][day]["FirstTrains"][:1]["Time"] for day in days_of_week]
+        last_trains_destinations = [r["StationTimes"][:1][day]["LastTrains"][:1]["DestinationStation"] for day in days_of_week]
+        last_trains_times = [r["StationTimes"][:1][day]["LastTrains"][:1]["Time"] for day in days_of_week]
     else 
-        # fill out the columns that are missing but in a familiar fashion.
-        first_trains_destinations = ["--", "--", "--", "--", "--", "--", "--"]
-        first_trains_times = ["--", "--", "--", "--", "--", "--", "--"]
-        last_trains_times = ["--", "--", "--", "--", "--", "--", "--"]
-        last_trains_destinations = ["--", "--", "--", "--", "--", "--", "--"] 
+        first_trains_destinations = ["--" for day in days_of_week]
+        first_trains_times = ["--" for day in days_of_week]
+        last_trains_times = ["--" for day in days_of_week]
+        last_trains_destinations = ["--" for day in days_of_week]
     end
 
     station_timings = DataFrame("StationName" => station_name, "StationCode" => station_code, "DayOfWeek" => days_of_week, 
@@ -164,13 +128,11 @@ For trains with no passengers, the DestinationName will be No Passenger.
 Next train arrival information is refreshed once every 20 to 30 seconds approximately.
 =#
 function rail_predictions(;StationCode::String = "All")
-    # get the station object for the station that we are calling in the function
     url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * StationCode * "/"
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 
-    # create the columns that will make up our dataframe
     lines = [station["Line"] for station = r["Trains"]]
     destination = [String(station["Destination"]) for station = r["Trains"]]
     group = [station["Group"] for station = r["Trains"]]
@@ -179,9 +141,6 @@ function rail_predictions(;StationCode::String = "All")
     mins = [station["Min"] for station = r["Trains"]]
     cars = [station["Car"] for station = r["Trains"]]
 
-    # create dataframe and 
-    # return it from function
-    # -----------------------
     rail_predictions = DataFrame("Arrival Station" => location, "Location Code" => location_code, "Line" => lines, "Cars" => cars, "Destination" => destination, "Group" => group, "Minutes" => mins)
 
     rail_predictions
@@ -200,24 +159,11 @@ function path_between(;FromStationCode::String, ToStationCode::String)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 
-    # define vectors for us to push info to
-    # -------------------------------------
-    seq_nums = [] 
-    station_names = []
-    station_codes = []
-    line_codes = []
-    distances_to_prev = []
-
-    # get the vectors of information, these 
-    # will be in order of sequence.
-    # -------------------------------------
-    for path_point in 1:length(r["Path"])
-        push!(seq_nums, r["Path"][path_point]["SeqNum"])
-        push!(station_names, r["Path"][path_point]["StationName"])
-        push!(station_codes, r["Path"][path_point]["StationCode"])
-        push!(line_codes, r["Path"][path_point]["LineCode"])
-        push!(distances_to_prev, r["Path"][path_point]["DistanceToPrev"])
-    end
+    seq_nums = [r["Path"][path_point]["SeqNum"] for path_point in 1:length(r["Path"])]
+    station_names = [r["Path"][path_point]["StationName"] for path_point in 1:length(r["Path"])]
+    station_codes = [r["Path"][path_point]["StationCode"] for path_point in 1:length(r["Path"])]
+    line_codes = [r["Path"][path_point]["LineCode"] for path_point in 1:length(r["Path"])]
+    distances_to_prev = [r["Path"][path_point]["DistanceToPrev"] for path_point in 1:length(r["Path"])]
 
     # check if user has input stations which are on the same line.
     if length(seq_nums) == 0 & length(station_names) == 0
@@ -241,28 +187,19 @@ function station_to_station(;FromStationCode::String = "", ToStationCode::String
     else
         url = "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?" * "FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
     end
+
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
-    # ----------------------------------------
-    origin_stations = [] 
-    destination_stations = []
-    composite_miles = [] 
-    rail_times = [] 
-    senior_rail_fare = [] 
-    peak_rail_fare = [] 
-    off_peak_rail_fare = []
-    # ----------------------------------------
-    for i in 1:length(r["StationToStationInfos"])
-        push!(origin_stations, r["StationToStationInfos"][i]["SourceStation"])
-        push!(destination_stations, r["StationToStationInfos"][i]["DestinationStation"])
-        push!(composite_miles, r["StationToStationInfos"][i]["CompositeMiles"])
-        push!(rail_times, r["StationToStationInfos"][i]["RailTime"])
-        push!(senior_rail_fare, r["StationToStationInfos"][i]["RailFare"]["SeniorDisabled"])
-        push!(peak_rail_fare, r["StationToStationInfos"][i]["RailFare"]["PeakTime"])
-        push!(off_peak_rail_fare, r["StationToStationInfos"][i]["RailFare"]["OffPeakTime"])
-    end 
-    # ----------------------------------------
+
+    origin_stations = [r["StationToStationInfos"][num]["SourceStation"] for num in 1:length(r["StationToStationInfos"])]
+    destination_stations = [r["StationToStationInfos"][num]["DestinationStation"] for num in 1:length(r["StationToStationInfos"])]
+    composite_miles = [r["StationToStationInfos"][num]["CompositeMiles"] for num in 1:length(r["StationToStationInfos"])] 
+    rail_times = [r["StationToStationInfos"][num]["RailTime"] for num in 1:length(r["StationToStationInfos"])] 
+    senior_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["SeniorDisabled"] for num in 1:length(r["StationToStationInfos"])] 
+    peak_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["PeakTime"] for num in 1:length(r["StationToStationInfos"])] 
+    off_peak_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["OffPeakTime"] for num in 1:length(r["StationToStationInfos"])]
+
     station_to_station = DataFrame("OriginStation" => origin_stations, "DestinationStation" => destination_stations, "CompositeMiles" => composite_miles, 
     "RailTimes" => rail_times, "SeniorRailFare" => senior_rail_fare, "PeakRailFare" => peak_rail_fare, "OffPeakRailFare" => off_peak_rail_fare)
     

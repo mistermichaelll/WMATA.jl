@@ -14,4 +14,5 @@ function WMATA_auth(SubscriptionKey::String)
         @error "Invalid Subscription Key. Please refer to your WMATA account."
     end
     global WMATA_AuthToken = SubscriptionKey
+    println("Authentication complete.")
 end
