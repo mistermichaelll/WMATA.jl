@@ -33,42 +33,22 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
     r = parse(String(r.body))
 
     # get the basic station elements
-    name = []
-    station_code = []
-    lat = []
-    long = []
-
-    # additional station elements dataframe will optionally include
-    station_together_1 = []
-    station_together_2 = []
-    line_code_2 = []
-    line_code_3 = []
-    line_code_4 = []
-
-    # address elements 
-    city = [] 
-    state = []
-    street = [] 
-    zip = []
-
-    for station in r["Stations"] 
-        push!(name, station["Name"])
-        push!(station_code, station["Code"])
-        # additional line codes
-        push!(line_code_2, station["LineCode2"])
-        push!(line_code_3, station["LineCode3"])
-        push!(line_code_4, station["LineCode4"])
-        # station together 1 
-        push!(station_together_1, station["StationTogether1"])
-        # lat/long 
-        push!(lat, station["Lat"])
-        push!(long, station["Lon"])
-        # address elements of the station 
-        push!(city, station["Address"][:"City"])
-        push!(state, station["Address"][:"State"])
-        push!(street, station["Address"][:"Street"])
-        push!(zip, station["Address"][:"Zip"])
-    end
+    name = [station["Name"] for station = r["Stations"]]
+    station_code = [station["Code"] for station = r["Stations"]]
+    # additional line codes
+    line_code_2 = [station["LineCode2"] for station = r["Stations"]]
+    line_code_3 = [station["LineCode3"] for station = r["Stations"]]
+    line_code_4 = [station["LineCode4"] for station = r["Stations"]]
+    # station together 1
+    station_together_1 = [station["StationTogether1"] for station = r["Stations"]]
+    # lat/long
+    lat = [station["Lat"] for station = r["Stations"]]
+    long = [station["Lon"] for station = r["Stations"]]
+    # address elements of the station 
+    city = [station["Address"][:"City"] for station = r["Stations"]]
+    state = [station["Address"][:"State"] for station = r["Stations"]]
+    street = [station["Address"][:"Street"] for station = r["Stations"]]
+    zip = [station["Address"][:"Zip"] for station = r["Stations"]]
 
     #= currently not in use, according to API doc.
 
@@ -184,32 +164,20 @@ For trains with no passengers, the DestinationName will be No Passenger.
 Next train arrival information is refreshed once every 20 to 30 seconds approximately.
 =#
 function rail_predictions(;StationCode::String = "All")
+    # get the station object for the station that we are calling in the function
     url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * StationCode * "/"
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 
-    # define empty lists for parsing json
-    # -----------------------------------
-    lines = []
-    destination = []
-    group = []
-    mins = [] 
-    location = []
-    location_code = []
-    cars = []
-
-    # create the lists that make up our dataframe 
-    # -------------------------------------------
-    for i in r["Trains"]
-        push!(lines, i["Line"])
-        push!(destination, String(i["Destination"]))
-        push!(group, i["Group"])
-        push!(location, String(i["LocationName"]))
-        push!(location_code, String(i["LocationCode"]))
-        push!(mins ,i["Min"])
-        push!(cars ,i["Car"])
-    end
+    # create the columns that will make up our dataframe
+    lines = [station["Line"] for station = r["Trains"]]
+    destination = [String(station["Destination"]) for station = r["Trains"]]
+    group = [station["Group"] for station = r["Trains"]]
+    location = [String(station["LocationName"]) for station = r["Trains"]]
+    location_code = [String(station["LocationCode"]) for station = r["Trains"]]
+    mins = [station["Min"] for station = r["Trains"]]
+    cars = [station["Car"] for station = r["Trains"]]
 
     # create dataframe and 
     # return it from function
