@@ -31,18 +31,18 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 
-    name = [station["Name"] for station = r["Stations"]]
-    station_code = [station["Code"] for station = r["Stations"]]
-    line_code_2 = [station["LineCode2"] for station = r["Stations"]]
-    line_code_3 = [station["LineCode3"] for station = r["Stations"]]
-    line_code_4 = [station["LineCode4"] for station = r["Stations"]]
-    station_together_1 = [station["StationTogether1"] for station = r["Stations"]]
-    lat = [station["Lat"] for station = r["Stations"]]
-    long = [station["Lon"] for station = r["Stations"]]
-    city = [station["Address"][:"City"] for station = r["Stations"]]
-    state = [station["Address"][:"State"] for station = r["Stations"]]
-    street = [station["Address"][:"Street"] for station = r["Stations"]]
-    zip = [station["Address"][:"Zip"] for station = r["Stations"]]
+    name = [station["Name"] for station in r["Stations"]]
+    station_code = [station["Code"] for station in r["Stations"]]
+    line_code_2 = [station["LineCode2"] for station in r["Stations"]]
+    line_code_3 = [station["LineCode3"] for station in r["Stations"]]
+    line_code_4 = [station["LineCode4"] for station in r["Stations"]]
+    station_together_1 = [station["StationTogether1"] for station in r["Stations"]]
+    lat = [station["Lat"] for station in r["Stations"]]
+    long = [station["Lon"] for station in r["Stations"]]
+    city = [station["Address"][:"City"] for station in r["Stations"]]
+    state = [station["Address"][:"State"] for station in r["Stations"]]
+    street = [station["Address"][:"Street"] for station in r["Stations"]]
+    zip = [station["Address"][:"Zip"] for station in r["Stations"]]
 
     if IncludeAdditionalInfo == true
         station_info = DataFrame("StationName" => name, "StationCode" => station_code, 
@@ -79,7 +79,7 @@ function station_timings(;StationCode::String)
     station_name = r["StationTimes"][1]["StationName"]
     station_code = r["StationTimes"][1]["Code"]
 
-    opening_times = [r["StationTimes"][1][day]["OpeningTime"] for day = days_of_week]
+    opening_times = [r["StationTimes"][1][day]["OpeningTime"] for day in days_of_week]
     #= 
     from messing about in the API, there are cases where first/last train info is coming back empty and 
     resulting in an out of bounds error in Julia. I'm setting a drop condition (d_c) so that if these 
@@ -133,13 +133,13 @@ function rail_predictions(;StationCode::String = "All")
     r = request("GET", url, subscription_key)
     r = parse(String(r.body))
 
-    lines = [station["Line"] for station = r["Trains"]]
-    destination = [String(station["Destination"]) for station = r["Trains"]]
-    group = [station["Group"] for station = r["Trains"]]
-    location = [String(station["LocationName"]) for station = r["Trains"]]
-    location_code = [String(station["LocationCode"]) for station = r["Trains"]]
-    mins = [station["Min"] for station = r["Trains"]]
-    cars = [station["Car"] for station = r["Trains"]]
+    lines = [station["Line"] for station in r["Trains"]]
+    destination = [String(station["Destination"]) for station in r["Trains"]]
+    group = [station["Group"] for station in r["Trains"]]
+    location = [String(station["LocationName"]) for station in r["Trains"]]
+    location_code = [String(station["LocationCode"]) for station in r["Trains"]]
+    mins = [station["Min"] for station in r["Trains"]]
+    cars = [station["Car"] for station in r["Trains"]]
 
     rail_predictions = DataFrame("Arrival Station" => location, "Location Code" => location_code, "Line" => lines, "Cars" => cars, "Destination" => destination, "Group" => group, "Minutes" => mins)
 
