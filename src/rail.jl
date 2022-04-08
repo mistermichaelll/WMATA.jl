@@ -10,7 +10,8 @@ those up this way.
 include("utils.jl")
 
 function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = false)
-    LineCode = verify_line_inputs(LineCode)
+    LineCode = verify_line_input(LineCode)
+
     if LineCode == "All" 
         url = "https://api.wmata.com/Rail.svc/json/jStations"
     else 
@@ -48,11 +49,9 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
 end
 
 function station_timings(;StationCode::String)
-    if StationCode == "" 
-        ArgumentError("Please select a single station code.")
-    else 
-        url = "https://api.wmata.com/Rail.svc/json/jStationTimes" * "?StationCode=" * StationCode
-    end
+    StationCode = verify_station_input(StationCode)
+
+    url = "https://api.wmata.com/Rail.svc/json/jStationTimes" * "?StationCode=" * StationCode
     
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
@@ -98,6 +97,8 @@ function station_timings(;StationCode::String)
 end
 
 function rail_predictions(;StationCode::String = "All")
+    StationCode = verify_station_input(StationCode)
+
     url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * StationCode * "/"
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
@@ -117,6 +118,9 @@ function rail_predictions(;StationCode::String = "All")
 end
 
 function path_between(;FromStationCode::String, ToStationCode::String)
+    FromStationCode = verify_station_input(FromStationCode)
+    ToStationCode = verify_station_input(ToStationCode)
+
     url = "https://api.wmata.com/Rail.svc/json/jPath?" * "FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
@@ -139,6 +143,9 @@ function path_between(;FromStationCode::String, ToStationCode::String)
 end
 
 function station_to_station(;FromStationCode::String = "", ToStationCode::String = "")
+    FromStationCode = verify_station_input(FromStationCode)
+    ToStationCode = verify_station_input(ToStationCode)
+
     if (FromStationCode == "" && ToStationCode == "")
         url = "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo"
     else
