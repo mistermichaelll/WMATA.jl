@@ -7,7 +7,7 @@ so that mistakes are obvious and not mysterious.
 function verify_line_input(line_input)
     line_colors = ["RD", "BL", "YL", "OR", "GR", "SV", "All"]
     if !(line_input in line_colors)
-        error("ERROR: line must be one of: RD, BL, YL, OR, GR, SV, or All")
+        error("LineCode must be one of: RD, BL, YL, OR, GR, SV, or All")
     else 
         return(line_input)
     end
@@ -23,7 +23,7 @@ function verify_station_input(station_input)
     valid_station_codes = push!([station["Code"] for station in r["Stations"]], "All")
 
     if !(station_input in valid_station_codes)
-        error("ERROR: $station_input is not a valid station code.\nTry using station_list to find and verify your station code.")
+        error("$station_input is not a valid station code.\nTry using station_list to find and verify your station code.")
     else 
         return(station_input)
     end
