@@ -23,7 +23,7 @@ function verify_station_input(station_input)
     valid_station_codes = push!([station["Code"] for station in r["Stations"]], "All")
 
     if !(station_input in valid_station_codes)
-        error("ERROR: $station_input is not a valid station code.\nTry using station_list to find and verify your station code,\nor use \"All\"")
+        error("ERROR: $station_input is not a valid station code.\nTry using station_list to find and verify your station code.")
     else 
         return(station_input)
     end
