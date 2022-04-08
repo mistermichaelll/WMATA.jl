@@ -7,20 +7,11 @@ This contains functions for getting information about WMATA's rail (Metro) stati
 Given that WMATA's API has methods for buses as well – I thought it may make sense to split 
 those up this way.
 =#
+include("utils.jl")
 
-#= 
-Function Name: station_list 
-Description: Returns a dataframe of station location and address information based on a given LineCode. 
-Arguments:
-    1) LineCode - can be empty or one of the following two-letter abbreviations: 
-        RD - Red
-        YL - Yellow
-        GR - Green
-        BL - Blue
-        OR - Orange
-        SV - Silver
-=#
 function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = false)
+    LineCode = verify_line_input(LineCode)
+
     if LineCode == "All" 
         url = "https://api.wmata.com/Rail.svc/json/jStations"
     else 
@@ -57,18 +48,10 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
     station_info
 end
 
-#= 
-Function Name: station_timings
-Description: Returns opening and scheduled first/last train times based on a given StationCode.
-
-Note that for stations with multiple platforms (e.g.: Metro Center, L'Enfant Plaza, etc.), a distinct call is required for each StationCode to retrieve the full set of train times at such stations. 
-=#
 function station_timings(;StationCode::String)
-    if StationCode == "" 
-        ArgumentError("Please select a single station code.")
-    else 
-        url = "https://api.wmata.com/Rail.svc/json/jStationTimes" * "?StationCode=" * StationCode
-    end
+    StationCode = verify_station_input(StationCode)
+
+    url = "https://api.wmata.com/Rail.svc/json/jStationTimes" * "?StationCode=" * StationCode
     
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
@@ -113,21 +96,9 @@ function station_timings(;StationCode::String)
     station_timings
 end
 
-#=
-Function Name: rail_predictions()
-Description: This function returns a dataframe with next train arrival information for one or more stations. 
-Will return an empty set of results when no predictions are available. 
-Use All for the StationCodes parameter to return predictions for all stations (this is default).
-
-For terminal stations (e.g.: Greenbelt, Shady Grove, etc.), predictions may be displayed twice.
-
-Some stations have two platforms (e.g.: Gallery Place, Fort Totten, L'Enfant Plaza, and Metro Center). To retrieve complete predictions for these stations, be sure to pass in both StationCodes.
-
-For trains with no passengers, the DestinationName will be No Passenger.
-
-Next train arrival information is refreshed once every 20 to 30 seconds approximately.
-=#
 function rail_predictions(;StationCode::String = "All")
+    StationCode = verify_station_input(StationCode)
+
     url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * StationCode * "/"
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
@@ -146,14 +117,10 @@ function rail_predictions(;StationCode::String = "All")
     rail_predictions
 end
 
-#=
-Function Name: path_between()
-
-Returns a set of ordered stations and distances between two stations on the same line.
-
-Note that this method is not suitable on its own as a pathfinding solution between stations.
-=#
 function path_between(;FromStationCode::String, ToStationCode::String)
+    FromStationCode = verify_station_input(FromStationCode)
+    ToStationCode = verify_station_input(ToStationCode)
+
     url = "https://api.wmata.com/Rail.svc/json/jPath?" * "FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     r = request("GET", url, subscription_key)
@@ -175,13 +142,10 @@ function path_between(;FromStationCode::String, ToStationCode::String)
     end
 end
 
-#=
-Function Name: station_to_station()
-
-Returns a distance, fare information, and estimated travel time between any two stations, including those on different lines. 
-Omit both parameters to retrieve data for all stations.
-=# 
 function station_to_station(;FromStationCode::String = "", ToStationCode::String = "")
+    FromStationCode = verify_station_input(FromStationCode)
+    ToStationCode = verify_station_input(ToStationCode)
+
     if (FromStationCode == "" && ToStationCode == "")
         url = "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo"
     else
