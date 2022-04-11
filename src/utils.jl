@@ -13,7 +13,7 @@ function verify_line_input(line_input)
     end
 end
 
-# 
+# verify that a station code has a match in the WMATA endpoint.
 function verify_station_input(station_input)
     # this function relies on the same endpoint that the station_list function does.
     subscription_key = Dict("api_key" => WMATA_AuthToken)
