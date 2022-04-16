@@ -1,6 +1,6 @@
 include("utils.jl")
 
-function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = false)
+function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = false)
     LineCode = verify_line_input(LineCode)
 
     if LineCode == "All" 

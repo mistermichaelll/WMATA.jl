@@ -9,7 +9,7 @@ function verify_line_input(line_input)
     if !(line_input in line_colors)
         error("LineCode must be one of: RD, BL, YL, OR, GR, SV, or All")
     else 
-        return(line_input)
+        return line_input
     end
 end
 
@@ -25,7 +25,7 @@ function verify_station_input(station_input)
     if !(station_input in valid_station_codes)
         error("$station_input is not a valid station code.\nTry using station_list to find and verify your station code.")
     else 
-        return(station_input)
+        return station_input
     end
 end
 
