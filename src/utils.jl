@@ -47,4 +47,5 @@ function get_station_code(StationName::String)
         error("$StationName is not a valid station name.") 
     else 
         return stations[StationName]
+    end
 end
