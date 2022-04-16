@@ -59,7 +59,7 @@ function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = f
     end
 end
 
-function station_timings(;StationCode::String, StationName::String = "")
+function station_timings(;StationCode::String = "", StationName::String = "")
     if StationName != ""
         StationCode = get_station_code(StationName)
     else 
