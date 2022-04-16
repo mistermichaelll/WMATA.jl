@@ -138,7 +138,7 @@ function rail_predictions(;StationCode::String = "All", StationName::String = ""
         "Cars" => cars, 
         "Destination" => destination, 
         "Group" => group, 
-        "Minutes" => mins
+        "Minutes" => convert_arrival_times(mins)
         )
 end
 
