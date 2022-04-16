@@ -9,7 +9,7 @@ function verify_line_input(line_input)
     if !(line_input in line_colors)
         error("LineCode must be one of: RD, BL, YL, OR, GR, SV, or All")
     else 
-        return(line_input)
+        return line_input
     end
 end
 
@@ -25,7 +25,27 @@ function verify_station_input(station_input)
     if !(station_input in valid_station_codes)
         error("$station_input is not a valid station code.\nTry using station_list to find and verify your station code.")
     else 
-        return(station_input)
+        return station_input
     end
 end
 
+#=
+support optional argument in functions that involve pulling details
+ based on a station code - enables a user to use a station name if they 
+ don't know the code.
+=# 
+function get_station_code(StationName::String)
+    subscription_key = Dict("api_key" => WMATA_AuthToken)
+    r = request("GET", "https://api.wmata.com/Rail.svc/json/jStations", subscription_key)
+    r = parse(String(r.body))
+
+    stations = Dict(
+        [station["Name"] for station in r["Stations"]] .=> [station["Code"] for station in r["Stations"]]
+    )
+
+    if !(StationName in keys(stations))
+        error("$StationName is not a valid station name.") 
+    else 
+        return stations[StationName]
+    end
+end

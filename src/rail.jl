@@ -1,15 +1,6 @@
-#=
-==========================================
-                RAIL
-==========================================
-This contains functions for getting information about WMATA's rail (Metro) stations.
-
-Given that WMATA's API has methods for buses as well – I thought it may make sense to split 
-those up this way.
-=#
 include("utils.jl")
 
-function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = false)
+function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = false)
     LineCode = verify_line_input(LineCode)
 
     if LineCode == "All" 
@@ -24,6 +15,7 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
 
     name = [station["Name"] for station in r["Stations"]]
     station_code = [station["Code"] for station in r["Stations"]]
+    line_code_1 = [station["LineCode1"] for station in r["Stations"]]
     line_code_2 = [station["LineCode2"] for station in r["Stations"]]
     line_code_3 = [station["LineCode3"] for station in r["Stations"]]
     line_code_4 = [station["LineCode4"] for station in r["Stations"]]
@@ -36,20 +28,43 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
     zip = [station["Address"][:"Zip"] for station in r["Stations"]]
 
     if IncludeAdditionalInfo == true
-        station_info = DataFrame("StationName" => name, "StationCode" => station_code, 
-        "StationTogether1" => station_together_1, 
-        "LineCode2" => line_code_2, "LineCode3" => line_code_3, "LineCode4" => line_code_4,
-        "Latitude" => lat, "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip)
+        return DataFrame(
+            "StationName" => name, 
+            "LineCode" => LineCode, 
+            "StationCode" => station_code, 
+            "StationTogether1" => station_together_1,
+            "LineCode" => line_code_1, 
+            "LineCode2" => line_code_2, 
+            "LineCode3" => line_code_3, 
+            "LineCode4" => line_code_4,
+            "Latitude" => lat, 
+            "Longitude" => long, 
+            "City" => city, 
+            "State" => state, 
+            "Street" => street, 
+            "Zip" => zip
+            )
     else 
-        station_info = DataFrame("StationName" => name, "StationCode" => station_code, "Latitude" => lat, 
-        "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip)
+        return DataFrame(
+            "StationName" => name, 
+            "StationCode" => station_code,
+            "LineCode" => line_code_1, 
+            "Latitude" => lat, 
+            "Longitude" => long, 
+            "City" => city, 
+            "State" => state, 
+            "Street" => street, 
+            "Zip" => zip
+        )
     end
-
-    station_info
 end
 
-function station_timings(;StationCode::String)
-    StationCode = verify_station_input(StationCode)
+function station_timings(;StationCode::String = "", StationName::String = "")
+    if StationName != ""
+        StationCode = get_station_code(StationName)
+    else 
+        verify_station_input(StationCode)
+    end 
 
     url = "https://api.wmata.com/Rail.svc/json/jStationTimes" * "?StationCode=" * StationCode
     
@@ -89,15 +104,24 @@ function station_timings(;StationCode::String)
         last_trains_destinations = ["--" for day in days_of_week]
     end
 
-    station_timings = DataFrame("StationName" => station_name, "StationCode" => station_code, "DayOfWeek" => days_of_week, 
-    "OpeningTime" => opening_times, "FirstTrainDestination" => first_trains_destinations, "FirstTrainTime" => first_trains_times, 
-    "LastTrainDestination" => last_trains_destinations, "LastTrainTime" => last_trains_times)
-
-    station_timings
+    return DataFrame(
+        "StationName" => station_name, 
+        "StationCode" => station_code, 
+        "DayOfWeek" => days_of_week, 
+        "OpeningTime" => opening_times, 
+        "FirstTrainDestination" => first_trains_destinations, 
+        "FirstTrainTime" => first_trains_times, 
+        "LastTrainDestination" => last_trains_destinations, 
+        "LastTrainTime" => last_trains_times
+        )
 end
 
-function rail_predictions(;StationCode::String = "All")
-    StationCode = verify_station_input(StationCode)
+function rail_predictions(;StationCode::String = "All", StationName::String = "")
+    if StationName != ""
+        StationCode = get_station_code(StationName)
+    else 
+        verify_station_input(StationCode)
+    end 
 
     url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * StationCode * "/"
     subscription_key = Dict("api_key" => WMATA_AuthToken)
@@ -112,9 +136,15 @@ function rail_predictions(;StationCode::String = "All")
     mins = [station["Min"] for station in r["Trains"]]
     cars = [station["Car"] for station in r["Trains"]]
 
-    rail_predictions = DataFrame("Arrival Station" => location, "Location Code" => location_code, "Line" => lines, "Cars" => cars, "Destination" => destination, "Group" => group, "Minutes" => mins)
-
-    rail_predictions
+    return DataFrame(
+        "Arrival Station" => location, 
+        "Location Code" => location_code, 
+        "Line" => lines, 
+        "Cars" => cars, 
+        "Destination" => destination, 
+        "Group" => group, 
+        "Minutes" => mins
+        )
 end
 
 function path_between(;FromStationCode::String, ToStationCode::String)
@@ -136,9 +166,13 @@ function path_between(;FromStationCode::String, ToStationCode::String)
     if length(seq_nums) == 0 & length(station_names) == 0
         @error "No path between stations. Did you choose stations on the same line?"
     else 
-        paths = DataFrame("SequenceNumber" => seq_nums, "StationName" => station_names, "StationCode" => station_codes, 
-        "LineCode" => line_codes, "DistanceToPrevious" => distances_to_prev)
-        paths 
+        return DataFrame(
+            "SequenceNumber" => seq_nums, 
+            "StationName" => station_names, 
+            "StationCode" => station_codes, 
+            "LineCode" => line_codes,
+            "DistanceToPrevious" => distances_to_prev
+            )
     end
 end
 
@@ -164,8 +198,13 @@ function station_to_station(;FromStationCode::String = "", ToStationCode::String
     peak_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["PeakTime"] for num in 1:length(r["StationToStationInfos"])] 
     off_peak_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["OffPeakTime"] for num in 1:length(r["StationToStationInfos"])]
 
-    station_to_station = DataFrame("OriginStation" => origin_stations, "DestinationStation" => destination_stations, "CompositeMiles" => composite_miles, 
-    "RailTimes" => rail_times, "SeniorRailFare" => senior_rail_fare, "PeakRailFare" => peak_rail_fare, "OffPeakRailFare" => off_peak_rail_fare)
-    
-    station_to_station
+    return DataFrame(
+        "OriginStation" => origin_stations, 
+        "DestinationStation" => destination_stations, 
+        "CompositeMiles" => composite_miles, 
+        "RailTimes" => rail_times, 
+        "SeniorRailFare" => senior_rail_fare, 
+        "PeakRailFare" => peak_rail_fare, 
+        "OffPeakRailFare" => off_peak_rail_fare
+        )
 end
