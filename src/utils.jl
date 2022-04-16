@@ -40,7 +40,7 @@ function get_station_code(StationName::String)
     r = parse(String(r.body))
 
     stations = Dict(
-        [station["Name"] for station in r["Stations"]] => [station["Code"] for station in r["Stations"]]
+        [station["Name"] for station in r["Stations"]] .=> [station["Code"] for station in r["Stations"]]
     )
 
     if !(StationName in keys(stations))
