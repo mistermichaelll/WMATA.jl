@@ -1,12 +1,3 @@
-#=
-==========================================
-                RAIL
-==========================================
-This contains functions for getting information about WMATA's rail (Metro) stations.
-
-Given that WMATA's API has methods for buses as well – I thought it may make sense to split 
-those up this way.
-=#
 include("utils.jl")
 
 function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = false)
