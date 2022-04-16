@@ -24,6 +24,7 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
 
     name = [station["Name"] for station in r["Stations"]]
     station_code = [station["Code"] for station in r["Stations"]]
+    line_code_1 = [station["LineCode1"] for station in r["Stations"]]
     line_code_2 = [station["LineCode2"] for station in r["Stations"]]
     line_code_3 = [station["LineCode3"] for station in r["Stations"]]
     line_code_4 = [station["LineCode4"] for station in r["Stations"]]
@@ -36,20 +37,35 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
     zip = [station["Address"][:"Zip"] for station in r["Stations"]]
 
     if IncludeAdditionalInfo == true
-        station_info = DataFrame(
+        return DataFrame(
             "StationName" => name, 
             "LineCode" => LineCode, 
             "StationCode" => station_code, 
-            "StationTogether1" => station_together_1, 
-            "LineCode2" => line_code_2, "LineCode3" => line_code_3, "LineCode4" => line_code_4,
-            "Latitude" => lat, "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip
+            "StationTogether1" => station_together_1,
+            "LineCode" => line_code_1, 
+            "LineCode2" => line_code_2, 
+            "LineCode3" => line_code_3, 
+            "LineCode4" => line_code_4,
+            "Latitude" => lat, 
+            "Longitude" => long, 
+            "City" => city, 
+            "State" => state, 
+            "Street" => street, 
+            "Zip" => zip
             )
     else 
-        station_info = DataFrame("StationName" => name, "StationCode" => station_code, "Latitude" => lat, 
-        "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip)
+        return DataFrame(
+            "StationName" => name, 
+            "StationCode" => station_code,
+            "LineCode" => line_code_1, 
+            "Latitude" => lat, 
+            "Longitude" => long, 
+            "City" => city, 
+            "State" => state, 
+            "Street" => street, 
+            "Zip" => zip
+        )
     end
-
-    station_info
 end
 
 function station_timings(;StationCode::String)
@@ -93,11 +109,16 @@ function station_timings(;StationCode::String)
         last_trains_destinations = ["--" for day in days_of_week]
     end
 
-    station_timings = DataFrame("StationName" => station_name, "StationCode" => station_code, "DayOfWeek" => days_of_week, 
-    "OpeningTime" => opening_times, "FirstTrainDestination" => first_trains_destinations, "FirstTrainTime" => first_trains_times, 
-    "LastTrainDestination" => last_trains_destinations, "LastTrainTime" => last_trains_times)
-
-    station_timings
+    return DataFrame(
+        "StationName" => station_name, 
+        "StationCode" => station_code, 
+        "DayOfWeek" => days_of_week, 
+        "OpeningTime" => opening_times, 
+        "FirstTrainDestination" => first_trains_destinations, 
+        "FirstTrainTime" => first_trains_times, 
+        "LastTrainDestination" => last_trains_destinations, 
+        "LastTrainTime" => last_trains_times
+        )
 end
 
 function rail_predictions(;StationCode::String = "All")
@@ -118,7 +139,7 @@ function rail_predictions(;StationCode::String = "All")
 
     rail_predictions = DataFrame("Arrival Station" => location, "Location Code" => location_code, "Line" => lines, "Cars" => cars, "Destination" => destination, "Group" => group, "Minutes" => mins)
 
-    rail_predictions
+    return rail_predictions
 end
 
 function path_between(;FromStationCode::String, ToStationCode::String)
@@ -171,5 +192,5 @@ function station_to_station(;FromStationCode::String = "", ToStationCode::String
     station_to_station = DataFrame("OriginStation" => origin_stations, "DestinationStation" => destination_stations, "CompositeMiles" => composite_miles, 
     "RailTimes" => rail_times, "SeniorRailFare" => senior_rail_fare, "PeakRailFare" => peak_rail_fare, "OffPeakRailFare" => off_peak_rail_fare)
     
-    station_to_station
+    return station_to_station
 end
