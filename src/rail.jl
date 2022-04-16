@@ -112,7 +112,7 @@ function station_timings(;StationCode::String)
         )
 end
 
-function rail_predictions(;StationCode::String = "All", StationName::String == "")
+function rail_predictions(;StationCode::String = "All", StationName::String = "")
     if StationName != ""
         StationCode = get_station_code(StationName)
     else 
@@ -142,7 +142,6 @@ function rail_predictions(;StationCode::String = "All", StationName::String == "
         "Minutes" => mins
         )
 end
-
 function path_between(;FromStationCode::String, ToStationCode::String)
     FromStationCode = verify_station_input(FromStationCode)
     ToStationCode = verify_station_input(ToStationCode)
