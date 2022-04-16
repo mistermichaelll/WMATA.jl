@@ -36,10 +36,14 @@ function station_list(;LineCode::String = "", IncludeAdditionalInfo::Bool = fals
     zip = [station["Address"][:"Zip"] for station in r["Stations"]]
 
     if IncludeAdditionalInfo == true
-        station_info = DataFrame("StationName" => name, "StationCode" => station_code, 
-        "StationTogether1" => station_together_1, 
-        "LineCode2" => line_code_2, "LineCode3" => line_code_3, "LineCode4" => line_code_4,
-        "Latitude" => lat, "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip)
+        station_info = DataFrame(
+            "StationName" => name, 
+            "LineCode" => LineCode, 
+            "StationCode" => station_code, 
+            "StationTogether1" => station_together_1, 
+            "LineCode2" => line_code_2, "LineCode3" => line_code_3, "LineCode4" => line_code_4,
+            "Latitude" => lat, "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip
+            )
     else 
         station_info = DataFrame("StationName" => name, "StationCode" => station_code, "Latitude" => lat, 
         "Longitude" => long, "City" => city, "State" => state, "Street" => street, "Zip" => zip)
