@@ -137,9 +137,15 @@ function rail_predictions(;StationCode::String = "All")
     mins = [station["Min"] for station in r["Trains"]]
     cars = [station["Car"] for station in r["Trains"]]
 
-    rail_predictions = DataFrame("Arrival Station" => location, "Location Code" => location_code, "Line" => lines, "Cars" => cars, "Destination" => destination, "Group" => group, "Minutes" => mins)
-
-    return rail_predictions
+    return DataFrame(
+        "Arrival Station" => location, 
+        "Location Code" => location_code, 
+        "Line" => lines, 
+        "Cars" => cars, 
+        "Destination" => destination, 
+        "Group" => group, 
+        "Minutes" => mins
+        )
 end
 
 function path_between(;FromStationCode::String, ToStationCode::String)
@@ -161,9 +167,13 @@ function path_between(;FromStationCode::String, ToStationCode::String)
     if length(seq_nums) == 0 & length(station_names) == 0
         @error "No path between stations. Did you choose stations on the same line?"
     else 
-        paths = DataFrame("SequenceNumber" => seq_nums, "StationName" => station_names, "StationCode" => station_codes, 
-        "LineCode" => line_codes, "DistanceToPrevious" => distances_to_prev)
-        paths 
+        return DataFrame(
+            "SequenceNumber" => seq_nums, 
+            "StationName" => station_names, 
+            "StationCode" => station_codes, 
+            "LineCode" => line_codes,
+            "DistanceToPrevious" => distances_to_prev
+            )
     end
 end
 
@@ -189,8 +199,13 @@ function station_to_station(;FromStationCode::String = "", ToStationCode::String
     peak_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["PeakTime"] for num in 1:length(r["StationToStationInfos"])] 
     off_peak_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["OffPeakTime"] for num in 1:length(r["StationToStationInfos"])]
 
-    station_to_station = DataFrame("OriginStation" => origin_stations, "DestinationStation" => destination_stations, "CompositeMiles" => composite_miles, 
-    "RailTimes" => rail_times, "SeniorRailFare" => senior_rail_fare, "PeakRailFare" => peak_rail_fare, "OffPeakRailFare" => off_peak_rail_fare)
-    
-    return station_to_station
+    return DataFrame(
+        "OriginStation" => origin_stations, 
+        "DestinationStation" => destination_stations, 
+        "CompositeMiles" => composite_miles, 
+        "RailTimes" => rail_times, 
+        "SeniorRailFare" => senior_rail_fare, 
+        "PeakRailFare" => peak_rail_fare, 
+        "OffPeakRailFare" => off_peak_rail_fare
+        )
 end
