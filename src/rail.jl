@@ -59,8 +59,12 @@ function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = f
     end
 end
 
-function station_timings(;StationCode::String)
-    StationCode = verify_station_input(StationCode)
+function station_timings(;StationCode::String, StationName::String = "")
+    if StationName != ""
+        StationCode = get_station_code(StationName)
+    else 
+        verify_station_input(StationCode)
+    end 
 
     url = "https://api.wmata.com/Rail.svc/json/jStationTimes" * "?StationCode=" * StationCode
     
@@ -116,7 +120,7 @@ function rail_predictions(;StationCode::String = "All", StationName::String = ""
     if StationName != ""
         StationCode = get_station_code(StationName)
     else 
-        StationCode 
+        verify_station_input(StationCode)
     end 
 
     url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * StationCode * "/"
@@ -142,6 +146,7 @@ function rail_predictions(;StationCode::String = "All", StationName::String = ""
         "Minutes" => mins
         )
 end
+
 function path_between(;FromStationCode::String, ToStationCode::String)
     FromStationCode = verify_station_input(FromStationCode)
     ToStationCode = verify_station_input(ToStationCode)
