@@ -3,9 +3,17 @@ since we're dealing with user input, it makes sense to build in some checks to t
 so that mistakes are obvious and not mysterious.
 =#
 
-#=
-wrapper for API request.
-=#
+# struct containing api key and urls
+struct wmata_API 
+    api_key::String 
+    station_list_url::String
+    station_timings_url::String 
+    rail_predictions_url::String
+    paths_url::String 
+    station_to_station_url::String
+end
+
+# wrapper for API requests.
 function wmata_request(url::String)
     subscription_key = Dict("api_key" => WMATA_AuthToken)
     api_response = parse(String(request("GET", url, subscription_key).body))
