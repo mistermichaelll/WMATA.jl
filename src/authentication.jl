@@ -5,7 +5,7 @@ an issue with their API. What I'd like to do here is make the other functions a 
 creates a global variable titled WMATA_AuthToken. Instead of a user defining a "sub_key" and then calling that in every function in the package, 
 they should be able to run this function, verify that the token is valid, and then not have to call it for each function.
 =#
-include("utils.jl")
+include("api.jl")
 
 function WMATA_auth(SubscriptionKey::String)
     url = "https://api.wmata.com/Misc/Validate"

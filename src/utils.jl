@@ -3,19 +3,9 @@ since we're dealing with user input, it makes sense to build in some checks to t
 so that mistakes are obvious and not mysterious.
 =#
 
-# struct containing api key and urls
-struct wmata_API 
-    api_key::String 
-    station_list_url::String
-    station_timings_url::String 
-    rail_predictions_url::String
-    paths_url::String 
-    station_to_station_url::String
-end
-
 # wrapper for API requests.
 function wmata_request(url::String)
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
+    subscription_key = Dict("api_key" => wmata.api_key)
     api_response = parse(String(request("GET", url, subscription_key).body))
     
     return api_response
@@ -34,7 +24,7 @@ end
 # verify that a station code has a match in the WMATA endpoint.
 function verify_station_input(station_input)
     # this function relies on the same endpoint that the station_list function does.
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
+    subscription_key = Dict("api_key" => wmata.api_key)
     r = request("GET", "https://api.wmata.com/Rail.svc/json/jStations", subscription_key)
     r = parse(String(r.body))
     
