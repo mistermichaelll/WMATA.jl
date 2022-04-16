@@ -43,7 +43,7 @@ function get_station_code(StationName::String)
         [station["Name"] for station in r["Stations"]] => [station["Code"] for station in r["Stations"]]
     )
 
-    if !(StationName in stations["Name"])
+    if !(StationName in keys(stations))
         error("$StationName is not a valid station name.") 
     else 
         return stations[StationName]
