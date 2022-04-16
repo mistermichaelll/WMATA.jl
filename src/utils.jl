@@ -53,17 +53,15 @@ end
 it makes sense that we'd want to parse arrival times to a better format (aka one that we can do arithmetic on), 
   there is probably a more Juli-onic way to do this but this is my best attempt at the moment. 
 =#
-function convert_arrival_times(arrival_times::Vector{Any})
+function convert_arrival_times(arrival_times::Vector{String})
     converted_times = []
     for time in arrival_times 
-        if typeof(time) == String 
-            if time == "ARR"
-                push!(converted_times, 0)
-            else 
-                push!(converted_times, missing) 
-            end 
-        elseif typeof(time) == Int64 
-            push!(converted_times, time) 
+        if time == "ARR"
+            push!(converted_times, 0)
+        elseif time == "-"
+            push!(converted_times, missing) 
+        else  
+            push!(converted_times, Base.parse(Int64, time))
         end 
     end
     return convert(Vector{Union{Missing, Int64}}, converted_times)
