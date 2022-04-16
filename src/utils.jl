@@ -29,3 +29,22 @@ function verify_station_input(station_input)
     end
 end
 
+#=
+support optional argument in functions that involve pulling details
+ based on a station code - enables a user to use a station name if they 
+ don't know the code.
+=# 
+function get_station_code(StationName::String)
+    subscription_key = Dict("api_key" => WMATA_AuthToken)
+    r = request("GET", "https://api.wmata.com/Rail.svc/json/jStations", subscription_key)
+    r = parse(String(r.body))
+
+    stations = Dict(
+        [station["Name"] for station in r["Stations"]] => [station["Code"] for station in r["Stations"]]
+    )
+
+    if !(StationName in stations["Name"])
+        error("$StationName is not a valid station name.") 
+    else 
+        return stations[StationName]
+end

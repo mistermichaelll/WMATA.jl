@@ -112,8 +112,12 @@ function station_timings(;StationCode::String)
         )
 end
 
-function rail_predictions(;StationCode::String = "All")
-    StationCode = verify_station_input(StationCode)
+function rail_predictions(;StationCode::String = "All", StationName::String == "")
+    if StationName != ""
+        StationCode = get_station_code(StationName)
+    else 
+        StationCode 
+    end 
 
     url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * StationCode * "/"
     subscription_key = Dict("api_key" => WMATA_AuthToken)
