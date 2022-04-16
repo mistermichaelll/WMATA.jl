@@ -3,6 +3,16 @@ since we're dealing with user input, it makes sense to build in some checks to t
 so that mistakes are obvious and not mysterious.
 =#
 
+#=
+wrapper for API request.
+=#
+function wmata_request(url::String)
+    subscription_key = Dict("api_key" => WMATA_AuthToken)
+    api_response = parse(String(request("GET", url, subscription_key).body))
+    
+    return api_response
+end
+
 # verify that a linecode is one that makes sense
 function verify_line_input(line_input)
     line_colors = ["RD", "BL", "YL", "OR", "GR", "SV", "All"]
