@@ -9,9 +9,7 @@ function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = f
         url = "https://api.wmata.com/Rail.svc/json/jStations" * "?LineCode=" * LineCode
     end
 
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
-    r = request("GET", url, subscription_key)
-    r = parse(String(r.body))
+    r = wmata_request(url)
 
     name = [station["Name"] for station in r["Stations"]]
     station_code = [station["Code"] for station in r["Stations"]]
