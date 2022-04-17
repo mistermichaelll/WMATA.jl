@@ -56,7 +56,7 @@ it makes sense that we'd want to parse arrival times to a better format (aka one
 function convert_arrival_times(arrival_times::Vector{String})
     converted_times = []
     for time in arrival_times 
-        if time == "ARR"
+        if time == "ARR" | time == "BRD"
             push!(converted_times, 0)
         elseif occursin(time, "-")
             push!(converted_times, missing) 
