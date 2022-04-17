@@ -177,7 +177,7 @@ function station_to_station(;FromStationCode::String = "", ToStationCode::String
     if (FromStationCode == "" && ToStationCode == "")
         url = wmata.station_to_station_url
     else
-        url = wmata.station_to_station_url * "FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
+        url = wmata.station_to_station_url * "?FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
     end
 
     r = wmata_request(url)
