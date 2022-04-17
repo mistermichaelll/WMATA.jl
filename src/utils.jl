@@ -24,9 +24,7 @@ end
 # verify that a station code has a match in the WMATA endpoint.
 function verify_station_input(station_input)
     # this function relies on the same endpoint that the station_list function does.
-    subscription_key = Dict("api_key" => wmata.api_key)
-    r = request("GET", "https://api.wmata.com/Rail.svc/json/jStations", subscription_key)
-    r = parse(String(r.body))
+    r = wmata_request(wmata.station_list_url)
     
     valid_station_codes = push!([station["Code"] for station in r["Stations"]], "All")
 
@@ -43,9 +41,7 @@ support optional argument in functions that involve pulling details
  don't know the code.
 =# 
 function get_station_code(StationName::String)
-    subscription_key = Dict("api_key" => wmata.api_key)
-    r = request("GET", "https://api.wmata.com/Rail.svc/json/jStations", subscription_key)
-    r = parse(String(r.body))
+    r = wmata_request(wmata.station_list_url)
 
     stations = Dict(
         [station["Name"] for station in r["Stations"]] .=> [station["Code"] for station in r["Stations"]]
