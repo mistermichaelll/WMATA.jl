@@ -43,7 +43,7 @@ support optional argument in functions that involve pulling details
  don't know the code.
 =# 
 function get_station_code(StationName::String)
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
+    subscription_key = Dict("api_key" => wmata.api_key)
     r = request("GET", "https://api.wmata.com/Rail.svc/json/jStations", subscription_key)
     r = parse(String(r.body))
 
