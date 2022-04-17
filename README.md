@@ -4,16 +4,17 @@ Julia package which simplifies the process of interacting with WMATA's public AP
 # Getting Started 
 You will need an API key from [WMATA's developer portal](https://developer.wmata.com/).
 
-You can get up and running with your subscription key using the `WMATA_auth()` function. This function verifies that you have a valid subscription key and sets a global variable called `WMATA_AuthToken` after verifying your key.
+You can get up and running with your subscription key using the `WMATA_auth()` function. This function verifies that you have a valid subscription key and sets a global struct called `wmata` that is accessible by the utility functions and rail methods.
 
 ```
 using WMATA
 WMATA_auth("your subscription key")
+#> Authentication complete.
 ```
 
 # Available Functions
 ## rail_predictions()
-Based on the *Real Time Rail Predictions* methods described in WMATA's documentation [here](https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f).
+Based on the *Real Time Rail Predictions* methods described in WMATA's documentation [here](https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f). You can provide a station code or station name.
 
 ```
 rail_predictions(StationCode = "All")
@@ -76,7 +77,7 @@ This will return the same DataFrame as above, with the following additions:
 
 ## station_timings()
 
-Returns a DataFrame of opening and scheduled first/last train times based on a given StationCode.
+Returns a DataFrame of opening and scheduled first/last train times based on a given StationCode or StationName.
 
 Note that for stations with multiple platforms (e.g.: Metro Center, L'Enfant Plaza, etc.), a distinct call is required for each StationCode to retrieve the full set of train times at such stations. 
 

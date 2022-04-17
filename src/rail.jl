@@ -4,14 +4,12 @@ function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = f
     LineCode = verify_line_input(LineCode)
 
     if LineCode == "All" 
-        url = "https://api.wmata.com/Rail.svc/json/jStations"
+        url = wmata.station_list_url
     else 
-        url = "https://api.wmata.com/Rail.svc/json/jStations" * "?LineCode=" * LineCode
+        url = wmata.station_list_url * "?LineCode=" * LineCode
     end
 
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
-    r = request("GET", url, subscription_key)
-    r = parse(String(r.body))
+    r = wmata_request(url)
 
     name = [station["Name"] for station in r["Stations"]]
     station_code = [station["Code"] for station in r["Stations"]]
@@ -66,11 +64,9 @@ function station_timings(;StationCode::String = "", StationName::String = "")
         verify_station_input(StationCode)
     end 
 
-    url = "https://api.wmata.com/Rail.svc/json/jStationTimes" * "?StationCode=" * StationCode
+    url = wmata.station_timings_url * "?StationCode=" * StationCode
     
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
-    r = request("GET", url, subscription_key)
-    r = parse(String(r.body))
+    r = wmata_request(url)
 
     days_of_week = ["Sunday" ,"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -123,10 +119,9 @@ function rail_predictions(;StationCode::String = "All", StationName::String = ""
         verify_station_input(StationCode)
     end 
 
-    url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/" * StationCode * "/"
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
-    r = request("GET", url, subscription_key)
-    r = parse(String(r.body))
+    url = wmata.rail_predictions_url * StationCode * "/"
+
+    r = wmata_request(url)
 
     lines = [station["Line"] for station in r["Trains"]]
     destination = [String(station["Destination"]) for station in r["Trains"]]
@@ -151,10 +146,9 @@ function path_between(;FromStationCode::String, ToStationCode::String)
     FromStationCode = verify_station_input(FromStationCode)
     ToStationCode = verify_station_input(ToStationCode)
 
-    url = "https://api.wmata.com/Rail.svc/json/jPath?" * "FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
-    r = request("GET", url, subscription_key)
-    r = parse(String(r.body))
+    url = wmata.paths_url * "FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
+    
+    r = wmata_request(url)
 
     seq_nums = [r["Path"][path_point]["SeqNum"] for path_point in 1:length(r["Path"])]
     station_names = [r["Path"][path_point]["StationName"] for path_point in 1:length(r["Path"])]
@@ -181,14 +175,12 @@ function station_to_station(;FromStationCode::String = "", ToStationCode::String
     ToStationCode = verify_station_input(ToStationCode)
 
     if (FromStationCode == "" && ToStationCode == "")
-        url = "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo"
+        url = wmata.station_to_station_url
     else
-        url = "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo?" * "FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
+        url = wmata.station_to_station_url * "FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
     end
 
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
-    r = request("GET", url, subscription_key)
-    r = parse(String(r.body))
+    r = wmata_request(url)
 
     origin_stations = [r["StationToStationInfos"][num]["SourceStation"] for num in 1:length(r["StationToStationInfos"])]
     destination_stations = [r["StationToStationInfos"][num]["DestinationStation"] for num in 1:length(r["StationToStationInfos"])]

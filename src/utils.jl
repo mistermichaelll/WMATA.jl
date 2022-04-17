@@ -1,7 +1,10 @@
-#=
-since we're dealing with user input, it makes sense to build in some checks to the functions 
-so that mistakes are obvious and not mysterious.
-=#
+# wrapper for API requests.
+function wmata_request(url::String)
+    subscription_key = Dict("api_key" => wmata.api_key)
+    api_response = parse(String(request("GET", url, subscription_key).body))
+    
+    return api_response
+end
 
 # verify that a linecode is one that makes sense
 function verify_line_input(line_input)
@@ -16,9 +19,7 @@ end
 # verify that a station code has a match in the WMATA endpoint.
 function verify_station_input(station_input)
     # this function relies on the same endpoint that the station_list function does.
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
-    r = request("GET", "https://api.wmata.com/Rail.svc/json/jStations", subscription_key)
-    r = parse(String(r.body))
+    r = wmata_request(wmata.station_list_url)
     
     valid_station_codes = push!([station["Code"] for station in r["Stations"]], "All")
 
@@ -32,12 +33,10 @@ end
 #=
 support optional argument in functions that involve pulling details
  based on a station code - enables a user to use a station name if they 
- don't know the code.
+ don't know the station code.
 =# 
 function get_station_code(StationName::String)
-    subscription_key = Dict("api_key" => WMATA_AuthToken)
-    r = request("GET", "https://api.wmata.com/Rail.svc/json/jStations", subscription_key)
-    r = parse(String(r.body))
+    r = wmata_request(wmata.station_list_url)
 
     stations = Dict(
         [station["Name"] for station in r["Stations"]] .=> [station["Code"] for station in r["Stations"]]
