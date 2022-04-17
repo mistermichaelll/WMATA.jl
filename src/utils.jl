@@ -1,8 +1,3 @@
-#=
-since we're dealing with user input, it makes sense to build in some checks to the functions 
-so that mistakes are obvious and not mysterious.
-=#
-
 # wrapper for API requests.
 function wmata_request(url::String)
     subscription_key = Dict("api_key" => wmata.api_key)
@@ -38,7 +33,7 @@ end
 #=
 support optional argument in functions that involve pulling details
  based on a station code - enables a user to use a station name if they 
- don't know the code.
+ don't know the station code.
 =# 
 function get_station_code(StationName::String)
     r = wmata_request(wmata.station_list_url)
