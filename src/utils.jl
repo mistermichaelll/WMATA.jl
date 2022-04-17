@@ -58,7 +58,7 @@ function convert_arrival_times(arrival_times::Vector{String})
     for time in arrival_times 
         if time == "ARR"
             push!(converted_times, 0)
-        elseif time == "-"
+        elseif occursin(time, "-")
             push!(converted_times, missing) 
         else  
             push!(converted_times, Base.parse(Int64, time))
