@@ -2,11 +2,19 @@
 Julia package which simplifies the process of interacting with WMATA's public API.
 
 # Getting Started 
+## Installation 
+Install the package via Julia's package system like so: 
+
+```julia 
+pkg> add "https://github.com/mistermichaelll/WMATA.jl"
+```
+
+## Using the Package
 You will need an API key from [WMATA's developer portal](https://developer.wmata.com/).
 
 You can get up and running with your subscription key using the `WMATA_auth()` function. This function verifies that you have a valid subscription key and sets a global struct called `wmata` that is accessible by the utility functions and rail methods.
 
-```
+```julia
 using WMATA
 WMATA_auth("your subscription key")
 #> Authentication complete.
