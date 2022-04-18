@@ -135,7 +135,10 @@ function rail_predictions(;StationCode::String = "All", StationName::String = ""
 
     rail_predictions_constructor(id_col::String) = (id_col => [station[id_col] for station in r["Trains"]])
 
-    rail_predictions = DataFrame(map(rail_predictions_constructor, response_elements))
+    rail_predictions = DataFrame(
+        map(rail_predictions_constructor, response_elements)
+        )
+        
     rename!(rail_predictions, :LocationName => :ArrivalStation)
     rail_predictions[!, :Min] = convert_arrival_times(rail_predictions[!, :Min])
 
