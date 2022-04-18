@@ -217,10 +217,9 @@ function get_train_positions()
     "CircuitId"
     ]
 
-    # a short function to help us save some code
-    get_position_elements(id_col::String) = (id_col => [train[id_col] for train in train_positions])
+    train_position_constructor(id_col::String) = (id_col => [train[id_col] for train in train_positions])
 
-    train_position_mapped = map(get_position_elements, response_elements)
-
-    return DataFrame(train_position_mapped)
+    return DataFrame(
+        map(train_position_constructor, response_elements)
+        )
 end
