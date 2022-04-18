@@ -119,7 +119,7 @@ function station_timings(;StationCode::String = "", StationName::String = "")
         "FirstTrainTime" => first_trains_times, 
         "LastTrainDestination" => last_trains_destinations, 
         "LastTrainTime" => last_trains_times
-        )
+    )
 end
 
 function rail_predictions(;StationCode::String = "All", StationName::String = "")
@@ -179,7 +179,7 @@ function path_between(;FromStationCode::String, ToStationCode::String)
             "StationCode" => station_codes, 
             "LineCode" => line_codes,
             "DistanceToPrevious" => distances_to_prev
-            )
+        )
     end
 end
 
