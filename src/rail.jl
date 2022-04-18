@@ -49,7 +49,7 @@ function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = f
 
     station_list = DataFrame(
         map(station_list_constructor, response_elements)
-        )
+    )
 
     # rename some columns to be clearer
     new_names = Dict(
