@@ -29,8 +29,7 @@ function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = f
             ["LineCode2", 
             "LineCode3", 
             "LineCode4", 
-            "StationTogether1"
-            ]
+            "StationTogether1"]
         )
     else 
         response_elements 
