@@ -11,50 +11,58 @@ function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = f
 
     r = wmata_request(url)
 
-    name = [station["Name"] for station in r["Stations"]]
-    station_code = [station["Code"] for station in r["Stations"]]
-    line_code_1 = [station["LineCode1"] for station in r["Stations"]]
-    line_code_2 = [station["LineCode2"] for station in r["Stations"]]
-    line_code_3 = [station["LineCode3"] for station in r["Stations"]]
-    line_code_4 = [station["LineCode4"] for station in r["Stations"]]
-    station_together_1 = [station["StationTogether1"] for station in r["Stations"]]
-    lat = [station["Lat"] for station in r["Stations"]]
-    long = [station["Lon"] for station in r["Stations"]]
-    city = [station["Address"][:"City"] for station in r["Stations"]]
-    state = [station["Address"][:"State"] for station in r["Stations"]]
-    street = [station["Address"][:"Street"] for station in r["Stations"]]
-    zip = [station["Address"][:"Zip"] for station in r["Stations"]]
+    response_elements = [
+        "Name", 
+        "Code", 
+        "LineCode1",
+        "Lat", 
+        "Lon", 
+        "City", 
+        "State", 
+        "Street", 
+        "Zip"
+    ]
 
-    if IncludeAdditionalInfo == true
-        return DataFrame(
-            "StationName" => name, 
-            "LineCode" => LineCode, 
-            "StationCode" => station_code, 
-            "StationTogether1" => station_together_1,
-            "LineCode" => line_code_1, 
-            "LineCode2" => line_code_2, 
-            "LineCode3" => line_code_3, 
-            "LineCode4" => line_code_4,
-            "Latitude" => lat, 
-            "Longitude" => long, 
-            "City" => city, 
-            "State" => state, 
-            "Street" => street, 
-            "Zip" => zip
-            )
-    else 
-        return DataFrame(
-            "StationName" => name, 
-            "StationCode" => station_code,
-            "LineCode" => line_code_1, 
-            "Latitude" => lat, 
-            "Longitude" => long, 
-            "City" => city, 
-            "State" => state, 
-            "Street" => street, 
-            "Zip" => zip
+    if IncludeAdditionalInfo == true 
+        append!(
+            response_elements,
+            ["StationTogether1",
+            "LineCode2", 
+            "LineCode3", 
+            "LineCode4"]
         )
+    else 
+        response_elements 
     end
+
+    function station_list_constructor(id_col::String)
+        address_element = ["City", "State", "Street", "Zip"]
+
+        if id_col in address_element 
+            (id_col => [station["Address"][id_col] for station in r["Stations"]])
+        else 
+            (id_col => [station[id_col] for station in r["Stations"]])
+        end 
+    end
+
+    station_list = DataFrame(
+        map(station_list_constructor, response_elements)
+        )
+
+    # rename some columns to be clearer
+    new_names = Dict(
+        "Name" => "StationName", 
+        "Code" => "StationCode",
+        "LineCode1" => "LineCode", 
+        "Lat" => "Latitude", 
+        "Lon" => "Longitude" 
+    )
+
+    for og_name in keys(new_names)
+        rename!(station_list, Symbol(og_name) => Symbol(new_names[og_name]))
+    end
+
+    return station_list
 end
 
 function station_timings(;StationCode::String = "", StationName::String = "")
@@ -225,4 +233,17 @@ function get_train_positions()
     return DataFrame(
         map(train_position_constructor, response_elements)
         )
+end
+
+
+function test_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = false)
+    LineCode = verify_line_input(LineCode)
+
+    if LineCode == "All" 
+        url = wmata.station_list_url
+    else 
+        url = wmata.station_list_url * "?LineCode=" * LineCode
+    end
+
+    r = wmata_request(url)
 end
