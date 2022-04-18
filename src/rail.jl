@@ -1,6 +1,6 @@
 include("utils.jl")
 
-function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = false)
+function get_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = false)
     LineCode = verify_line_input(LineCode)
 
     if LineCode == "All" 
@@ -67,7 +67,7 @@ function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = f
     return station_list
 end
 
-function station_timings(;StationCode::String = "", StationName::String = "")
+function get_station_timings(;StationCode::String = "", StationName::String = "")
     if StationName != ""
         StationCode = get_station_code(StationName)
     else 
@@ -122,7 +122,7 @@ function station_timings(;StationCode::String = "", StationName::String = "")
     )
 end
 
-function rail_predictions(;StationCode::String = "All", StationName::String = "")
+function get_rail_predictions(;StationCode::String = "All", StationName::String = "")
     if StationName != ""
         StationCode = get_station_code(StationName)
     else 
@@ -155,7 +155,7 @@ function rail_predictions(;StationCode::String = "All", StationName::String = ""
     return rail_predictions
 end
 
-function path_between(;FromStationCode::String, ToStationCode::String)
+function get_path_between(;FromStationCode::String, ToStationCode::String)
     FromStationCode = verify_station_input(FromStationCode)
     ToStationCode = verify_station_input(ToStationCode)
 
@@ -183,7 +183,7 @@ function path_between(;FromStationCode::String, ToStationCode::String)
     end
 end
 
-function station_to_station(;FromStationCode::String = "", ToStationCode::String = "")
+function get_station_to_station(;FromStationCode::String = "", ToStationCode::String = "")
     FromStationCode = verify_station_input(FromStationCode)
     ToStationCode = verify_station_input(ToStationCode)
 
