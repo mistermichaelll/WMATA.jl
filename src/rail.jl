@@ -234,16 +234,3 @@ function get_train_positions()
         map(train_position_constructor, response_elements)
         )
 end
-
-
-function test_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = false)
-    LineCode = verify_line_input(LineCode)
-
-    if LineCode == "All" 
-        url = wmata.station_list_url
-    else 
-        url = wmata.station_list_url * "?LineCode=" * LineCode
-    end
-
-    r = wmata_request(url)
-end
