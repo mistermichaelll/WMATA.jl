@@ -186,9 +186,6 @@ function get_path_between(;FromStationCode::String, ToStationCode::String)
 end
 
 function get_station_to_station(;FromStationCode::String = "", ToStationCode::String = "")
-    FromStationCode = verify_station_input(FromStationCode)
-    ToStationCode = verify_station_input(ToStationCode)
-
     if (FromStationCode == "" && ToStationCode == "")
         url = wmata.station_to_station_url
     else
@@ -197,23 +194,32 @@ function get_station_to_station(;FromStationCode::String = "", ToStationCode::St
 
     r = wmata_request(url)
 
-    origin_stations = [r["StationToStationInfos"][num]["SourceStation"] for num in 1:length(r["StationToStationInfos"])]
-    destination_stations = [r["StationToStationInfos"][num]["DestinationStation"] for num in 1:length(r["StationToStationInfos"])]
-    composite_miles = [r["StationToStationInfos"][num]["CompositeMiles"] for num in 1:length(r["StationToStationInfos"])] 
-    rail_times = [r["StationToStationInfos"][num]["RailTime"] for num in 1:length(r["StationToStationInfos"])] 
-    senior_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["SeniorDisabled"] for num in 1:length(r["StationToStationInfos"])] 
-    peak_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["PeakTime"] for num in 1:length(r["StationToStationInfos"])] 
-    off_peak_rail_fare = [r["StationToStationInfos"][num]["RailFare"]["OffPeakTime"] for num in 1:length(r["StationToStationInfos"])]
+    response_elements = [
+        "SourceStation", 
+        "DestinationStation", 
+        "CompositeMiles",
+        "RailTime", 
+        "SeniorDisabled", 
+        "PeakTime", 
+        "OffPeakTime"
+    ]
+
+    function station_to_station_constructor(id_col::String) 
+        rail_fare_elements = ["SeniorDisabled", "PeakTime", "OffPeakTime"]
+
+        if id_col in rail_fare_elements 
+            (id_col => [r["StationToStationInfos"][num]["RailFare"][id_col] for num in 1:length(r["StationToStationInfos"])])
+        else 
+            (id_col => [r["StationToStationInfos"][num][id_col] for num in 1:length(r["StationToStationInfos"])])
+        end
+    end
 
     return DataFrame(
-        "OriginStation" => origin_stations, 
-        "DestinationStation" => destination_stations, 
-        "CompositeMiles" => composite_miles, 
-        "RailTimes" => rail_times, 
-        "SeniorRailFare" => senior_rail_fare, 
-        "PeakRailFare" => peak_rail_fare, 
-        "OffPeakRailFare" => off_peak_rail_fare
-        )
+       map(
+           station_to_station_constructor, 
+           response_elements
+       ) 
+    )
 end
 
 function get_train_positions() 
