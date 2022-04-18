@@ -64,6 +64,7 @@ The resulting DataFrame includes:
 
 * **StationName:** name of the station.
 * **StationCode:** three digit station code. Can be used as an input to `rail_predictions()`.
+* **LineCode:** the LineCode of the station.
 * **Latitude:** Latitude.
 * **Longitude:** Longitude.
 * **City:** the city in which the station is located. 
