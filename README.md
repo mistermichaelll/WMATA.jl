@@ -1,9 +1,9 @@
 # WMATA.jl
-Julia package which simplifies the process of interacting with WMATA's public API.
+Julia package which simplifies the process of interacting with WMATA's public API via an opinionated wrapper to Julia's `DataFrames` package.
 
 # Getting Started 
 ## Installation 
-Install the package via Julia's package system like so: 
+Install the package from GitHub via Julia's package system: 
 
 ```julia 
 pkg> add "https://github.com/mistermichaelll/WMATA.jl"
