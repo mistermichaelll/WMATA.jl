@@ -141,11 +141,11 @@ function rail_predictions(;StationCode::String = "All", StationName::String = ""
         "Min" 
     ]
 
-    rail_predictions_constructor(id_col::String) = (id_col => [station[id_col] for station in r["Trains"]])
-
     rail_predictions = DataFrame(
-        map(rail_predictions_constructor, response_elements)
+        map(id_col -> (id_col => [station[id_col] for station in r["Trains"]]), 
+        response_elements
         )
+    )
         
     rename!(rail_predictions, :LocationName => :ArrivalStation)
     rail_predictions[!, :Min] = convert_arrival_times(rail_predictions[!, :Min])
@@ -228,9 +228,9 @@ function get_train_positions()
     "CircuitId"
     ]
 
-    train_position_constructor(id_col::String) = (id_col => [train[id_col] for train in train_positions])
-
     return DataFrame(
-        map(train_position_constructor, response_elements)
+        map(id_col -> (id_col => [train[id_col] for train in train_positions]),
+        response_elements
         )
+    )
 end
