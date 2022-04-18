@@ -163,23 +163,25 @@ function get_path_between(;FromStationCode::String, ToStationCode::String)
     
     r = wmata_request(url)
 
-    seq_nums = [r["Path"][path_point]["SeqNum"] for path_point in 1:length(r["Path"])]
-    station_names = [r["Path"][path_point]["StationName"] for path_point in 1:length(r["Path"])]
-    station_codes = [r["Path"][path_point]["StationCode"] for path_point in 1:length(r["Path"])]
-    line_codes = [r["Path"][path_point]["LineCode"] for path_point in 1:length(r["Path"])]
-    distances_to_prev = [r["Path"][path_point]["DistanceToPrev"] for path_point in 1:length(r["Path"])]
+    response_elements = [
+        "SeqNum", 
+        "StationName", 
+        "StationCode", 
+        "LineCode", 
+        "DistanceToPrev"
+    ]
 
-    # check if user has input stations which are on the same line.
-    if length(seq_nums) == 0 & length(station_names) == 0
+    paths_between = DataFrame(
+        map(
+        id_col -> (id_col => [r["Path"][path_point][id_col] for path_point in 1:length(r["Path"])]), 
+        response_elements
+        )
+    )
+
+    if nrow(paths_between) == 0 
         @error "No path between stations. Did you choose stations on the same line?"
     else 
-        return DataFrame(
-            "SequenceNumber" => seq_nums, 
-            "StationName" => station_names, 
-            "StationCode" => station_codes, 
-            "LineCode" => line_codes,
-            "DistanceToPrevious" => distances_to_prev
-        )
+        return paths_between 
     end
 end
 
