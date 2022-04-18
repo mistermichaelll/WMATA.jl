@@ -200,3 +200,27 @@ function station_to_station(;FromStationCode::String = "", ToStationCode::String
         "OffPeakRailFare" => off_peak_rail_fare
         )
 end
+
+function get_train_positions() 
+    r = wmata_request(wmata.train_positions_url)
+    train_positions = r["TrainPositions"]
+
+    response_elements = [
+    "CarCount", 
+    "DestinationStationCode",
+    "DirectionNum", 
+    "LineCode",	
+    "SecondsAtLocation",	
+    "ServiceType",	
+    "TrainId",
+    "TrainNumber",
+    "CircuitId"
+    ]
+
+    # a short function to help us save some code
+    get_position_elements(id_col::String) = (id_col => [train[id_col] for train in train_positions])
+
+    train_position_mapped = map(get_position_elements, response_elements)
+
+    return DataFrame(train_position_mapped)
+end

@@ -16,7 +16,8 @@ function WMATA_auth(SubscriptionKey::String)
         "https://api.wmata.com/Rail.svc/json/jStationTimes", 
         "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/", 
         "https://api.wmata.com/Rail.svc/json/jPath?", 
-        "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo"
+        "https://api.wmata.com/Rail.svc/json/jSrcStationToDstStationInfo", 
+        "https://api.wmata.com/TrainPositions/TrainPositions?contentType=json"
     )
 
     println("Authentication complete.")
