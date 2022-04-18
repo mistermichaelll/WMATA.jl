@@ -123,23 +123,23 @@ function rail_predictions(;StationCode::String = "All", StationName::String = ""
 
     r = wmata_request(url)
 
-    lines = [station["Line"] for station in r["Trains"]]
-    destination = [String(station["Destination"]) for station in r["Trains"]]
-    group = [station["Group"] for station in r["Trains"]]
-    location = [String(station["LocationName"]) for station in r["Trains"]]
-    location_code = [String(station["LocationCode"]) for station in r["Trains"]]
-    mins = [station["Min"] for station in r["Trains"]]
-    cars = [station["Car"] for station in r["Trains"]]
+    response_elements = [
+        "LocationName", 
+        "LocationCode",
+        "Line", 
+        "Car",
+        "Destination", 
+        "Group",  
+        "Min" 
+    ]
 
-    return DataFrame(
-        "Arrival Station" => location, 
-        "Location Code" => location_code, 
-        "Line" => lines, 
-        "Cars" => cars, 
-        "Destination" => destination, 
-        "Group" => group, 
-        "Minutes" => convert_arrival_times(mins)
-        )
+    rail_predictions_constructor(id_col::String) = (id_col => [station[id_col] for station in r["Trains"]])
+
+    rail_predictions = DataFrame(map(rail_predictions_constructor, response_elements))
+    rename!(rail_predictions, :LocationName => :ArrivalStation)
+    rail_predictions[!, :Min] = convert_arrival_times(rail_predictions[!, :Min])
+
+    return rail_predictions
 end
 
 function path_between(;FromStationCode::String, ToStationCode::String)
