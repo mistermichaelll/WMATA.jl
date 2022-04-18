@@ -34,7 +34,9 @@ function station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool = f
     else 
         response_elements 
     end
-
+    
+    # function we can map to the response elements to efficiently construct 
+    #  our dataframe!
     function station_list_constructor(id_col::String)
         address_element = ["City", "State", "Street", "Zip"]
 
