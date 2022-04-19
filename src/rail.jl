@@ -48,7 +48,9 @@ function get_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool
     end
 
     station_list = DataFrame(
-        map(station_list_constructor, response_elements)
+        map(station_list_constructor, 
+        response_elements
+        )
     )
 
     # rename some columns to be clearer
