@@ -6,4 +6,5 @@ struct wmata_API
     rail_predictions_url::String
     paths_url::String 
     station_to_station_url::String
+    train_positions_url::String
 end
