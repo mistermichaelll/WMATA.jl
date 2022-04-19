@@ -25,7 +25,7 @@ WMATA_auth("your subscription key")
 Based on the *Real Time Rail Predictions* methods described in WMATA's documentation [here](https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f). You can provide a station code or station name.
 
 ```
-rail_predictions(StationCode = "All")
+get_rail_predictions(StationCode = "All")
 ```
 Returns a DataFrame of next train arrival information for one or more stations. Will return an empty set of results when no predictions are available. Use All for the StationCodes parameter to return predictions for all stations.
 
@@ -45,7 +45,7 @@ Next train arrival information is refreshed once every 20 to 30 seconds approxim
 * **Group:** denotes the track this train is on, but does not necessarily equate to Track 1 or Track 2. With the exception of terminal stations, predictions at the same station with different Group values refer to trains on different tracks.
 * **Minutes:** minutes until arrival. Can be a numeric value, ARR (arriving), BRD (boarding), ---, or empty.
 
-## station_list()
+## get_station_list()
 Returns a DataFrame of station location and address information based on a given LineCode. Use `LineCode = "All"` to return all stations. 
 
 *LineCode* - can be "All" or one of the following two-letter abbreviations: 
@@ -84,7 +84,7 @@ This will return the same DataFrame as above, with the following additions:
 * **LineCode4:*** Additional line served by this station, if applicable. Currently not in use.
 * **StationTogether1:** For stations with multiple platforms (e.g.: Gallery Place, Fort Totten, L'Enfant Plaza, and Metro Center), the additional StationCode will be listed here.
 
-## station_timings()
+## get_station_timings()
 
 Returns a DataFrame of opening and scheduled first/last train times based on a given StationCode or StationName.
 
@@ -121,7 +121,7 @@ The resulting DataFrame includes:
 * **LineCode:**	Two-letter abbreviation for the line (e.g.: RD, BL, YL, OR, GR, or SV) this station's platform is on.
 * **DistanceToPrev:** Distance in feet to the previous station in the list.
 
-## station_to_station()
+## get_station_to_station()
 
 Returns a DataFrame with the distance, fare information, and estimated travel time between any two stations, including those on different lines. 
 
@@ -139,3 +139,24 @@ The resulting DataFrame includes:
 * **SeniorRailFare:** reduced fare for senior citizens or people with disabilities.
 * **PeakRailFare:** fare during peak times (weekdays from opening to 9:30 AM and 3-7 PM, and weekends from midnight to closing).
 * **OffPeakRailFare:** fare during off-peak times (times other than the ones described below).
+
+## get_train_positions()
+
+Returns uniquely identifiable trains in service and what track circuits they currently occupy. Will return an empty set of results when no positions are available.
+
+Data is refreshed once every 7-10 seconds.
+
+**CarCount:** number of cars. Can sometimes be 0 when there is no data available.
+**CircuitId:**	the circuit identifier the train is currently on. This identifier can be referenced from the Standard Routes method.
+**DestinationStationCode:**	destination station code. Can be NULL. Use this value in other rail-related APIs to retrieve data about a station. Note **that this value may sometimes differ from the destination station code returned by our Next Trains methods.
+**DirectionNum:** the direction of movement regardless of which track the train is on. Valid values are 1 or 2. Generally speaking, trains with direction 1 are northbound/eastbound, while trains with direction 2 are southbound/westbound.
+**LineCode:** two-letter abbreviation for the line (e.g.: RD, BL, YL, OR, GR, or SV). May also be NULL in certain cases.
+**SecondsAtLocation:** approximate "dwell time". This is not an exact value, but can be used to determine how long a train has been reported at the same track circuit.
+**ServiceType:** Service Type of a train, can be any of the following Service Types
+**TrainId:** uniquely identifiable internal train identifier.
+**TrainNumber:** non-unique train identifier, often used by WMATA's Rail Scheduling and Operations Teams, as well as over open radio communication.
+**Service Types:**
+- *NoPassengers:* This is a non-revenue train with no passengers on board. Note that this designation of NoPassengers does not necessarily correlate with PIDS "No Passengers". As of 08/22/2016, this functionality has been reinstated to include all non-revenue vehicles, with minor exceptions.
+- *Normal:*	this is a normal revenue service train.
+- *Special:* this is a special revenue service train with an unspecified line and destination. This is more prevalent during scheduled track work.
+- *Unknown:* this often denotes cases with unknown data or work vehicles.
