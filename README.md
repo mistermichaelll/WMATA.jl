@@ -128,7 +128,7 @@ Returns a DataFrame with the distance, fare information, and estimated travel ti
 Omit both `FromStationCode` and `ToStationCode` to retrieve data for all stations.
 
 ```
-station_to_station(FromStationCode = "C13", ToStationCode = "C14")
+get_station_to_station(FromStationCode = "C13", ToStationCode = "C14")
 ```
 The resulting DataFrame includes: 
 
