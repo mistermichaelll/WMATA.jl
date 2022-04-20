@@ -21,7 +21,7 @@ WMATA_auth("your subscription key")
 ```
 
 # Available Functions
-## rail_predictions()
+## get_rail_predictions()
 Based on the *Real Time Rail Predictions* methods described in WMATA's documentation [here](https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f). You can provide a station code or station name.
 
 ```
@@ -57,7 +57,7 @@ Returns a DataFrame of station location and address information based on a given
 * SV - Silver
 
 ```
-station_list(LineCode = "All")
+get_station_list(LineCode = "All")
 ```
 
 The resulting DataFrame includes:
@@ -74,7 +74,7 @@ The resulting DataFrame includes:
 An additional argument, `IncludeAdditionalInfo`, can be specified via `true/false`. 
 
 ```
-station_list(LineCode = "YL", IncludeAdditionalInfo = false)
+get_station_list(LineCode = "YL", IncludeAdditionalInfo = false)
 ```
 
 This will return the same DataFrame as above, with the following additions:
@@ -91,7 +91,7 @@ Returns a DataFrame of opening and scheduled first/last train times based on a g
 Note that for stations with multiple platforms (e.g.: Metro Center, L'Enfant Plaza, etc.), a distinct call is required for each StationCode to retrieve the full set of train times at such stations. 
 
 ```
-station_timings(StationCode = "C14")
+get_station_timings(StationCode = "C14")
 ```
 The resulting DataFrame includes:
 
@@ -104,14 +104,14 @@ The resulting DataFrame includes:
 * **LastTrainDestination:** the StationCode of the last train's destination.
 * **LastTrainTime:** last train leaves the station at this time. Format is HH::mm. Note that when the time is AM, it signifies the next day. For example, a value of 02:30 under a Saturday element means the last train leaves on Sunday at 2:30 AM.
 
-## path_between()
+## get_path_between()
 
 Returns a DataFrame of ordered stations and distances between two stations on the same line.
 
 *Note that this method is not suitable on its own as a pathfinding solution between stations.*
 
 ```
-path_between(FromStationCode = "C13", ToStationCode = "C14")
+get_path_between(FromStationCode = "C13", ToStationCode = "C14")
 ```
 The resulting DataFrame includes: 
 
