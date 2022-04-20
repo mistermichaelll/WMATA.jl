@@ -37,7 +37,7 @@ function get_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool
     
     # function we can map to the response elements to efficiently construct 
     #  our dataframe!
-    function station_list_constructor(id_col::String)
+    function _station_list_constructor(id_col::String)
         address_element = ["City", "State", "Street", "Zip"]
 
         if id_col in address_element 
@@ -48,7 +48,8 @@ function get_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool
     end
 
     station_list = DataFrame(
-        map(station_list_constructor, 
+        map(
+        _station_list_constructor, 
         response_elements
         )
     )
@@ -206,7 +207,7 @@ function get_station_to_station(;FromStationCode::String = "", ToStationCode::St
         "OffPeakTime"
     ]
 
-    function station_to_station_constructor(id_col::String) 
+    function _station_to_station_constructor(id_col::String) 
         rail_fare_elements = ["SeniorDisabled", "PeakTime", "OffPeakTime"]
 
         if id_col in rail_fare_elements 
@@ -218,7 +219,7 @@ function get_station_to_station(;FromStationCode::String = "", ToStationCode::St
 
     return DataFrame(
        map(
-           station_to_station_constructor, 
+           _station_to_station_constructor, 
            response_elements
        ) 
     )
