@@ -247,3 +247,23 @@ function get_train_positions()
         )
     )
 end
+
+function get_rail_incidents() 
+    r = wmata_request(wmata.rail_incidents_url)
+    
+    response_elements = [
+    "IncidentID", 
+    "Description", 
+    "EndLocationFullName", 
+    "PassengerDelay", 
+    "LinesAffected", 
+    "IncidentType", 
+    "DateUpdated"
+    ]
+
+    DataFrame( 
+        map(id_col -> (id_col => [r["Incidents"][incident][id_col] for incident in 1:length(r["Incidents"])]), 
+        response_elements
+        )
+    )
+end
