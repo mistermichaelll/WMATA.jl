@@ -270,7 +270,7 @@ function get_rail_incidents()
         end
     end
 
-    DataFrame( 
+    DataFrame(
         map(_rail_incidents_constructor, 
         response_elements
         )
