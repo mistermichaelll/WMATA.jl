@@ -263,7 +263,8 @@ function get_rail_incidents()
     "DateUpdated"
     ]
 
-    function _rail_incidents_constructor(id_col::String)
+    DataFrame(
+        map(response_elements) do id_col 
         if id_col == "LinesAffected"
             lines_affected = [r["Incidents"][incident][id_col] for incident in 1:length(r["Incidents"])]
             ("LinesAffected" => map(x -> split(replace(x, " " => ""), ';', keepempty = false), lines_affected))
@@ -271,11 +272,5 @@ function get_rail_incidents()
             (id_col => [r["Incidents"][incident][id_col] for incident in 1:length(r["Incidents"])]) 
         end
     end
-
-    DataFrame(
-        map(
-        _rail_incidents_constructor, 
-        response_elements
-        )
     )
 end
