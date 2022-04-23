@@ -147,7 +147,8 @@ function get_rail_predictions(;StationCode::String = "All", StationName::String 
     ]
 
     rail_predictions = DataFrame(
-        map(id_col -> (id_col => [station[id_col] for station in r["Trains"]]), 
+        map(
+        id_col -> (id_col => [station[id_col] for station in r["Trains"]]), 
         response_elements
         )
     )
@@ -242,7 +243,8 @@ function get_train_positions()
     ]
 
     return DataFrame(
-        map(id_col -> (id_col => [train[id_col] for train in train_positions]),
+        map(
+        id_col -> (id_col => [train[id_col] for train in train_positions]),
         response_elements
         )
     )
@@ -271,7 +273,8 @@ function get_rail_incidents()
     end
 
     DataFrame(
-        map(_rail_incidents_constructor, 
+        map(
+        _rail_incidents_constructor, 
         response_elements
         )
     )
