@@ -34,24 +34,15 @@ function get_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool
     else 
         response_elements 
     end
-    
-    # function we can map to the response elements to efficiently construct 
-    #  our dataframe!
-    function _station_list_constructor(id_col::String)
-        address_element = ["City", "State", "Street", "Zip"]
-
-        if id_col in address_element 
-            (id_col => [station["Address"][id_col] for station in r["Stations"]])
-        else 
-            (id_col => [station[id_col] for station in r["Stations"]])
-        end 
-    end
 
     station_list = DataFrame(
-        map(
-        _station_list_constructor, 
-        response_elements
-        )
+        map(response_elements) do id_col 
+            if id_col in ["City", "State", "Street", "Zip"] 
+                (id_col => [station["Address"][id_col] for station in r["Stations"]])
+            else 
+                (id_col => [station[id_col] for station in r["Stations"]])
+            end 
+        end
     )
 
     # rename some columns to be clearer
@@ -208,21 +199,14 @@ function get_station_to_station(;FromStationCode::String = "", ToStationCode::St
         "OffPeakTime"
     ]
 
-    function _station_to_station_constructor(id_col::String) 
-        rail_fare_elements = ["SeniorDisabled", "PeakTime", "OffPeakTime"]
-
-        if id_col in rail_fare_elements 
+    return DataFrame(
+       map(response_elements) do id_col 
+        if id_col in ["SeniorDisabled", "PeakTime", "OffPeakTime"]
             (id_col => [r["StationToStationInfos"][num]["RailFare"][id_col] for num in 1:length(r["StationToStationInfos"])])
         else 
             (id_col => [r["StationToStationInfos"][num][id_col] for num in 1:length(r["StationToStationInfos"])])
         end
-    end
-
-    return DataFrame(
-       map(
-           _station_to_station_constructor, 
-           response_elements
-       ) 
+        end
     )
 end
 
@@ -271,6 +255,6 @@ function get_rail_incidents()
         else 
             (id_col => [r["Incidents"][incident][id_col] for incident in 1:length(r["Incidents"])]) 
         end
-    end
+        end
     )
 end
