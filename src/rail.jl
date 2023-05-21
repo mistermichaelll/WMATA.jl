@@ -23,61 +23,6 @@ function get_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool
     return station_list
 end
 
-function get_station_timings(;StationCode::String = "", StationName::String = "")
-    if StationName != ""
-        StationCode = get_station_code(StationName)
-    else
-        verify_station_input(StationCode)
-    end
-
-    url = wmata.station_timings_url * "?StationCode=" * StationCode
-
-    r = wmata_request(url)
-
-    days_of_week = ["Sunday" ,"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-
-    station_name = r["StationTimes"][1]["StationName"]
-    station_code = r["StationTimes"][1]["Code"]
-
-    opening_times = [r["StationTimes"][1][day]["OpeningTime"] for day in days_of_week]
-    #=
-    from messing about in the API, there are cases where first/last train info is coming back empty and
-    resulting in an out of bounds error in Julia. I'm setting a drop condition so that if these
-    successfully run, the function will return the full dataframe. Otherwise, first/last train info
-    will be blank.
-    =#
-    drop_condition = "OK"
-    try
-        first_trains_destinations = [r["StationTimes"][:1][day]["FirstTrains"][:1]["DestinationStation"] for day in days_of_week]
-    catch
-        @warn "No First/Last train information available."
-        drop_condition = "DROP"
-    end
-
-    if drop_condition != "DROP"
-        first_trains_destinations = [r["StationTimes"][:1][day]["FirstTrains"][:1]["DestinationStation"] for day in days_of_week]
-        first_trains_times = [r["StationTimes"][:1][day]["FirstTrains"][:1]["Time"] for day in days_of_week]
-        last_trains_destinations = [r["StationTimes"][:1][day]["LastTrains"][:1]["DestinationStation"] for day in days_of_week]
-        last_trains_times = [r["StationTimes"][:1][day]["LastTrains"][:1]["Time"] for day in days_of_week]
-    else
-        first_trains_destinations = ["--" for day in days_of_week]
-        first_trains_times = ["--" for day in days_of_week]
-        last_trains_times = ["--" for day in days_of_week]
-        last_trains_destinations = ["--" for day in days_of_week]
-    end
-
-    return DataFrame(
-        "StationName" => station_name,
-        "StationCode" => station_code,
-        "DayOfWeek" => days_of_week,
-        "OpeningTime" => opening_times,
-        "FirstTrainDestination" => first_trains_destinations,
-        "FirstTrainTime" => first_trains_times,
-        "LastTrainDestination" => last_trains_destinations,
-        "LastTrainTime" => last_trains_times
-    )
-end
-
 function get_rail_predictions(;StationCode::String = "All", StationName::String = "")
     if StationName != ""
         StationCode = get_station_code(StationName)
