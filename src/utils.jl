@@ -34,7 +34,9 @@ end
 
 # verify that a station code has a match in the WMATA endpoint.
 function verify_station_input(station_input)
-    if !(station_input in values(get_station_names_and_codes()))
+    stations = get_station_names_and_codes()
+
+    if !(station_input in values(stations))
         error("$station_input is not a valid station code.\nTry using station_list to find and verify your station code.")
     else
         return station_input
