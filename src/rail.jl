@@ -11,52 +11,14 @@ function get_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool
 
     r = wmata_request(url)
 
-    response_elements = [
-        "Name",
-        "Code",
-        "LineCode1",
-        "Lat",
-        "Lon",
-        "City",
-        "State",
-        "Street",
-        "Zip"
-    ]
+    ## unnest the address from the station list
+    station_list_raw = DataFrame(r["Stations"])
+    addresses = station_list_raw[!, :Address] |> DataFrame
 
-    if IncludeAdditionalInfo == true
-        append!(
-            response_elements,
-            ["LineCode2",
-            "LineCode3",
-            "LineCode4",
-            "StationTogether1"]
-        )
-    else
-        response_elements
-    end
-
-    station_list = DataFrame(
-        map(response_elements) do id_col
-            if id_col in ["City", "State", "Street", "Zip"]
-                (id_col => [station["Address"][id_col] for station in r["Stations"]])
-            else
-                (id_col => [station[id_col] for station in r["Stations"]])
-            end
-        end
+    station_list = hcat(
+        select(station_list_raw, Not([:Address, :LineCode4])),
+        addresses
     )
-
-    # rename some columns to be clearer
-    new_names = Dict(
-        "Name" => "StationName",
-        "Code" => "StationCode",
-        "LineCode1" => "LineCode",
-        "Lat" => "Latitude",
-        "Lon" => "Longitude"
-    )
-
-    for og_name in keys(new_names)
-        rename!(station_list, Symbol(og_name) => Symbol(new_names[og_name]))
-    end
 
     return station_list
 end
