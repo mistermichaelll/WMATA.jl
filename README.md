@@ -71,19 +71,6 @@ The resulting DataFrame includes:
 * **State:** the state in which the station is located. 
 * **Zip:** the Zip code in which the station is located.
 
-An additional argument, `IncludeAdditionalInfo`, can be specified via `true/false`. 
-
-```
-get_station_list(LineCode = "YL", IncludeAdditionalInfo = false)
-```
-
-This will return the same DataFrame as above, with the following additions:
-
-* **LineCode2:***	Additional line served by this station, if applicable.
-* **LineCode3:*** Additional line served by this station, if applicable.
-* **LineCode4:*** Additional line served by this station, if applicable. Currently not in use.
-* **StationTogether1:** For stations with multiple platforms (e.g.: Gallery Place, Fort Totten, L'Enfant Plaza, and Metro Center), the additional StationCode will be listed here.
-
 ## get_path_between()
 
 Returns a DataFrame of ordered stations and distances between two stations on the same line.
