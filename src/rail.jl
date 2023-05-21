@@ -11,7 +11,7 @@ function get_station_list(;LineCode::String = "All", IncludeAdditionalInfo::Bool
 
     r = wmata_request(url)
 
-    ## unnest the address from the station list
+    # unnest the "Address" column
     station_list_raw = DataFrame(r["Stations"])
     addresses = station_list_raw[!, :Address] |> DataFrame
 
