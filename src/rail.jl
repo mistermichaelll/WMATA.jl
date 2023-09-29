@@ -32,6 +32,13 @@ function get_station_list(;LineCode::String = "All")
     return station_list
 end
 
+"""
+    get_rail_predictions()
+
+Returns next train arrival information for one or more stations. Will return an empty DataFrame of results when no predictions are available.
+
+Use "All" for the StationCode parameter to return predictions for all stations.
+"""
 function get_rail_predictions(;StationCode::String = "All", StationName::String = "")
     if StationName != ""
         StationCode = get_station_code(StationName)
