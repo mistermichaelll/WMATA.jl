@@ -47,26 +47,7 @@ function get_path_between(;FromStationCode::String, ToStationCode::String)
 
     r = wmata_request(url)
 
-    response_elements = [
-        "SeqNum",
-        "StationName",
-        "StationCode",
-        "LineCode",
-        "DistanceToPrev"
-    ]
-
-    paths_between = DataFrame(
-        map(
-        id_col -> (id_col => [r["Path"][path_point][id_col] for path_point in 1:length(r["Path"])]),
-        response_elements
-        )
-    )
-
-    if nrow(paths_between) == 0
-        @error "No path between stations. Did you choose stations on the same line?"
-    else
-        return paths_between
-    end
+    return r[:Path] |> DataFrame
 end
 
 function get_station_to_station(;FromStationCode::String = "", ToStationCode::String = "")
