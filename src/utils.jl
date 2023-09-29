@@ -45,8 +45,8 @@ end
 
 #=
 support optional argument in functions that involve pulling details
- based on a station code - enables a user to use a station name if they
- don't know the station code.
+    based on a station code - enables a user to use a station name if they
+    don't know the station code.
 =#
 function get_station_code(StationName::String)
     stations = get_station_names_and_codes()
