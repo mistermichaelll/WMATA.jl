@@ -101,49 +101,12 @@ end
 
 function get_train_positions()
     r = wmata_request(wmata.train_positions_url)
-    train_positions = r["TrainPositions"]
 
-    response_elements = [
-    "CarCount",
-    "DestinationStationCode",
-    "DirectionNum",
-    "LineCode",
-    "SecondsAtLocation",
-    "ServiceType",
-    "TrainId",
-    "TrainNumber",
-    "CircuitId"
-    ]
-
-    return DataFrame(
-        map(
-        id_col -> (id_col => [train[id_col] for train in train_positions]),
-        response_elements
-        )
-    )
+    return r[:TrainPositions] |> DataFrame
 end
 
 function get_rail_incidents()
     r = wmata_request(wmata.rail_incidents_url)
 
-    response_elements = [
-    "IncidentID",
-    "Description",
-    "EndLocationFullName",
-    "PassengerDelay",
-    "LinesAffected",
-    "IncidentType",
-    "DateUpdated"
-    ]
-
-    DataFrame(
-        map(response_elements) do id_col
-        if id_col == "LinesAffected"
-            lines_affected = [r["Incidents"][incident][id_col] for incident in 1:length(r["Incidents"])]
-            ("LinesAffected" => map(x -> split(replace(x, " " => ""), ';', keepempty = false), lines_affected))
-        else
-            (id_col => [r["Incidents"][incident][id_col] for incident in 1:length(r["Incidents"])])
-        end
-        end
-    )
+    return r[:Incidents] |> DataFrame
 end
