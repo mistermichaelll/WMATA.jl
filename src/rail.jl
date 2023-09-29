@@ -76,12 +76,12 @@ function get_station_to_station(;FromStationCode::String = "", ToStationCode::St
         url = wmata.station_to_station_url * "?FromStationCode=" * FromStationCode * "&" * "ToStationCode=" * ToStationCode
     end
 
-    r = wmata_request(url)
+    r = wmata_request(url)[:StationToStationInfos]
 
     main_cols = [:SourceStation, :DestinationStation, :CompositeMiles, :RailTime]
 
     df_a = DataFrame(; (col => [r[i][col] for i in eachindex(r)] for col in main_cols)...)
-    df_b = DataFrame(r[length(r)][:RailFare])
+    df_b = DataFrame([r[i][:RailFare] for i in eachindex(r)])
 
     return hcat(df_a, df_b)
 end
