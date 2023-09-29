@@ -78,25 +78,12 @@ function get_station_to_station(;FromStationCode::String = "", ToStationCode::St
 
     r = wmata_request(url)
 
-    response_elements = [
-        "SourceStation",
-        "DestinationStation",
-        "CompositeMiles",
-        "RailTime",
-        "SeniorDisabled",
-        "PeakTime",
-        "OffPeakTime"
-    ]
+    main_cols = [:SourceStation, :DestinationStation, :CompositeMiles, :RailTime]
 
-    return DataFrame(
-       map(response_elements) do id_col
-        if id_col in ["SeniorDisabled", "PeakTime", "OffPeakTime"]
-            (id_col => [r["StationToStationInfos"][num]["RailFare"][id_col] for num in 1:length(r["StationToStationInfos"])])
-        else
-            (id_col => [r["StationToStationInfos"][num][id_col] for num in 1:length(r["StationToStationInfos"])])
-        end
-        end
-    )
+    df_a = DataFrame(; (col => [r[i][col] for i in eachindex(r)] for col in main_cols)...)
+    df_b = DataFrame(r[length(r)][:RailFare])
+
+    return hcat(df_a, df_b)
 end
 
 function get_train_positions()
