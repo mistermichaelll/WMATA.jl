@@ -81,6 +81,7 @@ function get_station_to_station(;FromStationCode::String = "", ToStationCode::St
     main_cols = [:SourceStation, :DestinationStation, :CompositeMiles, :RailTime]
 
     df_a = DataFrame(; (col => [r[i][col] for i in eachindex(r)] for col in main_cols)...)
+    # rail fare is basically a nested JSON object, split it out and make it separate columns.
     df_b = DataFrame([r[i][:RailFare] for i in eachindex(r)])
 
     return hcat(df_a, df_b)
