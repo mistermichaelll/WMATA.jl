@@ -1,5 +1,14 @@
 include("utils.jl")
 
+"""
+    get_station_list()
+
+Returns a list of station location and address information based on a given LineCode. Omit the LineCode to return all stations.
+
+```julia-repl
+julia> get_station_list(; LineCode = "YL")
+```
+"""
 function get_station_list(;LineCode::String = "All")
     LineCode = verify_line_input(LineCode)
 
