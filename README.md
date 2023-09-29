@@ -71,39 +71,6 @@ The resulting DataFrame includes:
 * **State:** the state in which the station is located. 
 * **Zip:** the Zip code in which the station is located.
 
-An additional argument, `IncludeAdditionalInfo`, can be specified via `true/false`. 
-
-```
-get_station_list(LineCode = "YL", IncludeAdditionalInfo = false)
-```
-
-This will return the same DataFrame as above, with the following additions:
-
-* **LineCode2:***	Additional line served by this station, if applicable.
-* **LineCode3:*** Additional line served by this station, if applicable.
-* **LineCode4:*** Additional line served by this station, if applicable. Currently not in use.
-* **StationTogether1:** For stations with multiple platforms (e.g.: Gallery Place, Fort Totten, L'Enfant Plaza, and Metro Center), the additional StationCode will be listed here.
-
-## get_station_timings()
-
-Returns a DataFrame of opening and scheduled first/last train times based on a given StationCode or StationName.
-
-Note that for stations with multiple platforms (e.g.: Metro Center, L'Enfant Plaza, etc.), a distinct call is required for each StationCode to retrieve the full set of train times at such stations. 
-
-```
-get_station_timings(StationCode = "C14")
-```
-The resulting DataFrame includes:
-
-* **StationName:** name of the station.
-* **StationCode:** three digit station code. Can be used as an input to `rail_predictions()`.
-* **DayOfWeek:** the day of the week.
-* **OpeningTime:** the time that the station opens.
-* **FirstTrainDestination:** the StationCode of the first train's destination.
-* **FirstTrainTime:** first train leaves the station at this time. Format is HH:mm. 
-* **LastTrainDestination:** the StationCode of the last train's destination.
-* **LastTrainTime:** last train leaves the station at this time. Format is HH::mm. Note that when the time is AM, it signifies the next day. For example, a value of 02:30 under a Saturday element means the last train leaves on Sunday at 2:30 AM.
-
 ## get_path_between()
 
 Returns a DataFrame of ordered stations and distances between two stations on the same line.
